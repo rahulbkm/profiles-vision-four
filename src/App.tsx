@@ -43,7 +43,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const App: React.FC = () => {
   return (
-    <Router>
+    <Router basename="/profiles-vision-four">
       <Layout>
         <Routes>
           <Route path="/" element={<MainContent />} />
