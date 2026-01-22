@@ -340,7 +340,13 @@ const VoiceChannelEdit: React.FC = () => {
                     <select
                       className="form-select"
                       value={selectedConversationFlow}
-                      onChange={(e) => setSelectedConversationFlow(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedConversationFlow(e.target.value);
+                        // Automatically select default AI agent when conversation flow is selected
+                        if (e.target.value) {
+                          setSelectedAIAgent('agent1');
+                        }
+                      }}
                     >
                       <option value="">Select a conversation flow</option>
                       <option value="flow1">Standard Customer Service Flow</option>
