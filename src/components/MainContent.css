@@ -1,0 +1,160 @@
+.main-content {
+  margin-left: 160px;
+  margin-top: 48px;
+  padding: 32px 48px;
+  background-color: #faf9f8;
+  min-height: calc(100vh - 48px);
+  position: relative;
+}
+
+.content-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #323130;
+  margin: 0 0 12px 0;
+}
+
+.page-description {
+  font-size: 14px;
+  color: #605e5c;
+  line-height: 20px;
+  margin: 0;
+  max-width: 800px;
+}
+
+.collapsible-section {
+  background-color: white;
+  border: 1px solid #edebe9;
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+
+.section-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  gap: 8px;
+  text-align: left;
+}
+
+.section-header:hover {
+  background-color: #f3f2f1;
+}
+
+.chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.chevron.expanded {
+  transform: rotate(0deg);
+}
+
+.chevron:not(.expanded) {
+  transform: rotate(-90deg);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #323130;
+}
+
+.section-content {
+  border-top: 1px solid #edebe9;
+}
+
+.channel-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px;
+  border-bottom: 1px solid #edebe9;
+}
+
+.channel-item:last-child {
+  border-bottom: none;
+}
+
+.channel-item:hover {
+  background-color: #f3f2f1;
+}
+
+.channel-info {
+  flex: 1;
+}
+
+.channel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #323130;
+  margin: 0 0 8px 0;
+}
+
+.channel-description {
+  font-size: 14px;
+  color: #605e5c;
+  line-height: 20px;
+  margin: 0 0 8px 0;
+}
+
+.learn-more {
+  font-size: 14px;
+  color: #0078d4;
+  text-decoration: none;
+}
+
+.learn-more:hover {
+  text-decoration: underline;
+}
+
+.manage-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #0078d4;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.manage-button:hover {
+  background-color: #e1dfdd;
+}
+
+.add-button {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #0078d4;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3.2px 7.2px rgba(0, 0, 0, 0.132), 0 0.6px 1.8px rgba(0, 0, 0, 0.108);
+  transition: transform 0.1s ease;
+}
+
+.add-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6.4px 14.4px rgba(0, 0, 0, 0.132), 0 1.2px 3.6px rgba(0, 0, 0, 0.108);
+}
+
+.add-button:active {
+  transform: scale(0.95);
+}

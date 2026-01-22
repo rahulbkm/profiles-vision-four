@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamics 365 - Routing profiles</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont,
+                Roboto, 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            height: 48px;
+            background-color: #1b3a57;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .waffle-menu {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+        }
+
+        .waffle-menu:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .header-subtitle {
+            color: white;
+            text-decoration: underline;
+            font-size: 13px;
+        }
+
+        .header-subtitle:hover {
+            text-decoration: none;
+        }
+
+        .header-center {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 40px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 32px;
+            padding: 0 12px 0 36px;
+            border: none;
+            border-radius: 2px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .search-input:focus {
+            outline: 2px solid #0078d4;
+            outline-offset: -2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            width: 32px;
+            height: 32px;
+        }
+
+        .icon-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .avatar-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #0078d4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 160px;
+            background-color: #f3f2f1;
+            position: fixed;
+            top: 48px;
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            border-right: 1px solid #e1dfdd;
+        }
+
+        .hamburger-menu {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 12px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            color: #323130;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #e1dfdd;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #323130;
+            padding: 8px 12px;
+            text-transform: capitalize;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            color: #323130;
+            text-decoration: none;
+            font-size: 13px;
+            position: relative;
+            gap: 8px;
+        }
+
+        .nav-item:hover {
+            background-color: #e1dfdd;
+        }
+
+        .nav-item.active {
+            background-color: #edebe9;
+            font-weight: 600;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: #0078d4;
+        }
+
+        .nav-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .nav-item span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 160px;
+            margin-top: 48px;
+            padding: 32px 48px;
+            background-color: #faf9f8;
+            min-height: calc(100vh - 48px);
+            position: relative;
+        }
+
+        /* Toolbar Styles */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            gap: 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 8px;
+        }
+
+        .add-button-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: none;
+            border: 1px solid #8a8886;
+            border-radius: 2px;
+            font-size: 14px;
+            color: #323130;
+            cursor: pointer;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .add-button-toolbar:hover {
+            background-color: #f3f2f1;
+            border-color: #323130;
+        }
+
+        .refresh-button {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: none;
+            border: 1px solid #8a8886;
+            border-radius: 2px;
+            font-size: 14px;
+            color: #323130;
+            cursor: pointer;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .refresh-button:hover {
+            background-color: #f3f2f1;
+            border-color: #323130;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box-toolbar {
+            position: relative;
+            min-width: 250px;
+        }
+
+        .search-box-toolbar .search-icon {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .search-input-toolbar {
+            width: 100%;
+            height: 32px;
+            padding: 0 8px 0 28px;
+            border: 1px solid #8a8886;
+            border-radius: 2px;
+            font-size: 14px;
+            background-color: white;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .search-input-toolbar:focus {
+            outline: 2px solid #0078d4;
+            outline-offset: -2px;
+            border-color: #0078d4;
+        }
+
+        .content-header {
+            margin-bottom: 32px;
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+            color: #0078d4;
+            text-decoration: none;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+
+        .breadcrumb:hover {
+            text-decoration: underline;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #323130;
+            margin: 0 0 12px 0;
+        }
+
+        .page-description {
+            font-size: 14px;
+            color: #605e5c;
+            line-height: 20px;
+            margin: 0;
+            max-width: 800px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background-color: white;
+            border: 1px solid #edebe9;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table thead {
+            background-color: #faf9f8;
+            border-bottom: 1px solid #edebe9;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: #323130;
+            border-bottom: 1px solid #edebe9;
+        }
+
+        .th-content {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sort-icon {
+            color: #605e5c;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #edebe9;
+        }
+
+        .data-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f3f2f1;
+        }
+
+        .data-table td {
+            padding: 12px 16px;
+            color: #323130;
+        }
+
+        .table-link {
+            color: #0078d4;
+            text-decoration: none;
+        }
+
+        .table-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f3f2f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c8c6c4;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a19f9d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button class="waffle-menu" aria-label="Apps menu">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <circle cx="3" cy="3" r="2" />
+                    <circle cx="10" cy="3" r="2" />
+                    <circle cx="17" cy="3" r="2" />
+                    <circle cx="3" cy="10" r="2" />
+                    <circle cx="10" cy="10" r="2" />
+                    <circle cx="17" cy="10" r="2" />
+                    <circle cx="3" cy="17" r="2" />
+                    <circle cx="10" cy="17" r="2" />
+                    <circle cx="17" cy="17" r="2" />
+                </svg>
+            </button>
+            <div class="header-title">Dynamics 365</div>
+            <a href="#" class="header-subtitle">Copilot Service admin center</a>
+        </div>
+        <div class="header-center">
+            <div class="search-box">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M11.5 6.5a5 5 0 1 1-10 0 5 5 0 0 1 10 0zm-1.27 4.27a6 6 0 1 1 1.06-1.06l3.5 3.5-1.06 1.06-3.5-3.5z" />
+                </svg>
+                <input type="text" placeholder="Search" class="search-input" />
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="icon-button" aria-label="Notifications">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 2a6 6 0 0 1 6 6v3.58l1.71 1.71A1 1 0 0 1 17 15H3a1 1 0 0 1-.71-1.71L4 11.58V8a6 6 0 0 1 6-6zm2 14a2 2 0 1 1-4 0h4z" />
+                </svg>
+            </button>
+            <button class="icon-button" aria-label="Add">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="10" y1="5" x2="10" y2="15" />
+                    <line x1="5" y1="10" x2="15" y2="10" />
+                </svg>
+            </button>
+            <button class="icon-button" aria-label="Settings">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="10" cy="10" r="3" />
+                    <path d="M10 1v2m0 14v2M4.22 4.22l1.42 1.42m8.68 8.68l1.42 1.42M1 10h2m14 0h2M4.22 15.78l1.42-1.42m8.68-8.68l1.42-1.42" />
+                </svg>
+            </button>
+            <button class="icon-button" aria-label="Help">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    <path d="M10 14v.5M10 11a2 2 0 1 1 0-4 2 2 0 0 1 0 4v2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+                </svg>
+            </button>
+            <button class="icon-button" aria-label="Feedback">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <circle cx="10" cy="7" r="1.5" />
+                    <path d="M7 13c0-1.5 1-3 3-3s3 1.5 3 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+                </svg>
+            </button>
+            <button class="avatar-button">
+                <span class="avatar">AU</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <button class="hamburger-menu">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M2 3h12v1H2V3zm0 4.5h12v1H2v-1zM2 12h12v1H2v-1z" />
+            </svg>
+        </button>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Get started</div>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 2L2 6v6a2 2 0 002 2h8a2 2 0 002-2V6l-6-4z" />
+                    </svg>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5" fill="none" />
+                        <path d="M10 10l4 4" stroke="currentColor" stroke-width="1.5" />
+                    </svg>
+                    <span>Search admin sett...</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 2a6 6 0 100 12A6 6 0 008 2z" />
+                    </svg>
+                    <span>Guided channel s...</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Customer support</div>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="2" y="3" width="12" height="10" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="8" cy="5" r="2.5" />
+                        <path d="M3 13c0-2.5 2-4 5-4s5 1.5 5 4" />
+                    </svg>
+                    <span>User management</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>AI Agents</span>
+                </a>
+                <a href="index-standalone.html" class="nav-item active">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M2 2h12v2H2V2zm0 5h12v2H2V7zm0 5h12v2H2v-2z" />
+                    </svg>
+                    <span>Channels</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 2l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z" />
+                    </svg>
+                    <span>Intent</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="2" y="3" width="12" height="10" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Queues</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none" />
+                        <path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Routing</span>
+                </a>
+                <a href="profiles.html" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="8" cy="5" r="2.5" />
+                        <path d="M3 13c0-2.5 2-4 5-4s5 1.5 5 4" />
+                    </svg>
+                    <span>Profiles</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Case settings</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Customer settings</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Quality managem...</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Support experience</div>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="2" y="3" width="12" height="10" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Workspaces</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Productivity</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Knowledge</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Collaboration</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Operations</div>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="2" y="3" width="12" height="10" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="2" y="2" width="12" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Insights</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Workforce manag...</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                    </svg>
+                    <span>Calendar</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <button class="add-button-toolbar">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    Add routing profile
+                </button>
+                <button class="refresh-button">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M13.65 2.35A7.95 7.95 0 0 0 8 0C3.58 0 0 3.58 0 8s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L9 7h7V0l-2.35 2.35z" />
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+            <div class="toolbar-right">
+                <div class="search-box-toolbar">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M11.5 6.5a5 5 0 1 1-10 0 5 5 0 0 1 10 0zm-1.27 4.27a6 6 0 1 1 1.06-1.06l3.5 3.5-1.06 1.06-3.5-3.5z" />
+                    </svg>
+                    <input type="text" placeholder="Search profiles" class="search-input-toolbar" />
+                </div>
+            </div>
+        </div>
+
+        <div class="content-header">
+            <a href="profiles.html" class="breadcrumb">Profiles</a>
+            <h1 class="page-title">Routing profiles</h1>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <div class="th-content">
+                                Profile Name
+                                <svg class="sort-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M6 3l3 4H3l3-4z" />
+                                </svg>
+                            </div>
+                        </th>
+                        <th>Skill Matching Algorithm</th>
+                        <th>Fallback Queue</th>
+                        <th>Owner</th>
+                        <th>CreatedOn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="routing-profile-edit.html?id=1" class="table-link">Standard Routing Profile</a></td>
+                        <td>Nearest match</td>
+                        <td>General Support Queue</td>
+                        <td>Aurora365 User6</td>
+                        <td>9/10/2025 1:30 PM</td>
+                    </tr>
+                    <tr>
+                        <td><a href="routing-profile-edit.html?id=2" class="table-link">Priority Routing Profile</a></td>
+                        <td>Exact match</td>
+                        <td>Escalation Queue</td>
+                        <td>Aurora365 User6</td>
+                        <td>8/14/2025 4:44 PM</td>
+                    </tr>
+                    <tr>
+                        <td><a href="routing-profile-edit.html?id=3" class="table-link">Skill-Based Routing Profile</a></td>
+                        <td>Exact match</td>
+                        <td>Overflow Queue</td>
+                        <td>Aurora365 User6</td>
+                        <td>8/19/2025 6:28 PM</td>
+                    </tr>
+                    <tr>
+                        <td><a href="routing-profile-edit.html?id=4" class="table-link">Round Robin Routing Profile</a></td>
+                        <td>None</td>
+                        <td>General Support Queue</td>
+                        <td>Aurora365 User6</td>
+                        <td>8/1/2025 12:32 PM</td>
+                    </tr>
+                    <tr>
+                        <td><a href="routing-profile-edit.html?id=5" class="table-link">VIP Routing Profile</a></td>
+                        <td>Exact match</td>
+                        <td>Supervisor Queue</td>
+                        <td>Aurora365 User6</td>
+                        <td>8/5/2025 1:32 PM</td>
+                    </tr>
+                    <tr>
+                        <td><a href="routing-profile-edit.html?id=6" class="table-link">After Hours Routing</a></td>
+                        <td>Nearest match</td>
+                        <td>General Support Queue</td>
+                        <td>Aurora365 User6</td>
+                        <td>8/7/2025 5:00 PM</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>
