@@ -10,11 +10,11 @@ const VoiceChannelEdit: React.FC = () => {
   const [channelDetailsExpanded, setChannelDetailsExpanded] = useState(true);
 
   // Form state
-  const [phoneNumber, setPhoneNumber] = useState('+1 (555) 123-4567');
-  const [region, setRegion] = useState('US East');
-  const [isTollFree, setIsTollFree] = useState(true);
-  const [canMakeCalls, setCanMakeCalls] = useState(true);
-  const [canReceiveCalls, setCanReceiveCalls] = useState(true);
+  const [phoneNumber] = useState('+1 (555) 123-4567');
+  const [region] = useState('US East');
+  const [isTollFree] = useState(true);
+  const [canMakeCalls] = useState(true);
+  const [canReceiveCalls] = useState(true);
   const [primaryLanguage, setPrimaryLanguage] = useState('English');
   const [additionalLanguages, setAdditionalLanguages] = useState<string[]>([]);
   const [operatingHoursEnabled, setOperatingHoursEnabled] = useState(false);
