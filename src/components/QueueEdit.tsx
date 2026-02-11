@@ -75,63 +75,81 @@ const engagementProfiles = [
 const engagementProfileConfigs: { [key: string]: any } = {
   'profile1': {
     automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Queue position and wait time notifications enabled',
     notifications: '5 notification templates assigned',
     workDistribution: 'Exact match skill algorithm, Default capacity profile',
     assignmentMethod: 'Round robin with agent affinity',
     afterCallWork: 'Custom time (30 seconds)',
-    consultTransfer: 'Both consult and transfer enabled',
+    consultTransfer: 'External phone and Teams enabled',
     postCallSurvey: 'Customer Satisfaction Survey Bot',
-    sessionTemplate: 'Default Voice Session Template'
+    sessionTemplate: 'Default Voice Session Template',
+    overflowManagement: '2 pre-queue rules, 3 in-queue rules configured',
+    conversationTimeoutRules: '2 timeout rules configured'
   },
   'profile2': {
     automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Queue position notifications only',
     notifications: '5 notification templates with priority alerts',
     workDistribution: 'Exact match skill algorithm, High Volume Capacity Profile',
     assignmentMethod: 'Highest capacity',
     afterCallWork: 'Custom time (60 seconds)',
-    consultTransfer: 'Both consult and transfer enabled',
+    consultTransfer: 'External phone and Teams enabled',
     postCallSurvey: 'Net Promoter Score (NPS) Bot',
-    sessionTemplate: 'Omnichannel Session Template'
+    sessionTemplate: 'Omnichannel Session Template',
+    overflowManagement: '1 pre-queue rule, 2 in-queue rules configured',
+    conversationTimeoutRules: '3 timeout rules configured'
   },
   'profile3': {
     automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Wait time notifications only',
     notifications: '5 notification templates assigned',
     workDistribution: 'Nearest match skill algorithm, Default capacity profile',
     assignmentMethod: 'Least active',
     afterCallWork: 'Custom time (45 seconds)',
-    consultTransfer: 'Both consult and transfer enabled',
+    consultTransfer: 'External phone and Teams enabled',
     postCallSurvey: 'Detailed Feedback Survey Bot',
-    sessionTemplate: 'Technical Support Session Template'
+    sessionTemplate: 'Technical Support Session Template',
+    overflowManagement: '2 pre-queue rules, 2 in-queue rules configured',
+    conversationTimeoutRules: '1 timeout rule configured'
   },
   'profile4': {
     automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Queue position and wait time notifications enabled',
     notifications: '5 notification templates assigned',
     workDistribution: 'Exact match skill algorithm, Default capacity profile',
     assignmentMethod: 'Round robin',
     afterCallWork: 'Custom time (30 seconds)',
-    consultTransfer: 'Both consult and transfer enabled',
+    consultTransfer: 'External phone and Teams enabled',
     postCallSurvey: 'Quick Rating Bot (1-5 stars)',
-    sessionTemplate: 'Sales Session Template'
+    sessionTemplate: 'Sales Session Template',
+    overflowManagement: '1 pre-queue rule, 1 in-queue rule configured',
+    conversationTimeoutRules: '2 timeout rules configured'
   },
   'profile5': {
     automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Notifications disabled',
     notifications: '5 notification templates assigned',
     workDistribution: 'None skill matching, Low Volume Capacity Profile',
     assignmentMethod: 'Round robin',
     afterCallWork: 'Never block',
-    consultTransfer: 'Transfer only (consult disabled)',
+    consultTransfer: 'Transfer only - external phone enabled',
     postCallSurvey: 'No survey',
-    sessionTemplate: 'Minimal Session Template'
+    sessionTemplate: 'Minimal Session Template',
+    overflowManagement: '1 pre-queue rule configured',
+    conversationTimeoutRules: 'No timeout rules'
   },
   'profile6': {
     automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Queue position and wait time notifications enabled',
     notifications: '5 notification templates assigned',
     workDistribution: 'Exact match skill algorithm, Default capacity profile',
     assignmentMethod: 'Least active',
     afterCallWork: 'Custom time (30 seconds)',
-    consultTransfer: 'Both consult and transfer enabled',
+    consultTransfer: 'External phone and Teams enabled',
     postCallSurvey: 'Customer Satisfaction Survey Bot',
-    sessionTemplate: 'Customer Service Session Template'
+    sessionTemplate: 'Customer Service Session Template',
+    overflowManagement: '2 pre-queue rules, 2 in-queue rules configured',
+    conversationTimeoutRules: '2 timeout rules configured'
   }
 };
 
@@ -302,6 +320,10 @@ const QueueEdit: React.FC = () => {
                   <div className="summary-value">{selectedProfileConfig.automatedMessages}</div>
                 </div>
                 <div className="summary-item">
+                  <div className="summary-label">Customer wait time</div>
+                  <div className="summary-value">{selectedProfileConfig.customerWaitTime}</div>
+                </div>
+                <div className="summary-item">
                   <div className="summary-label">Notifications</div>
                   <div className="summary-value">{selectedProfileConfig.notifications}</div>
                 </div>
@@ -329,65 +351,17 @@ const QueueEdit: React.FC = () => {
                   <div className="summary-label">Session template</div>
                   <div className="summary-value">{selectedProfileConfig.sessionTemplate}</div>
                 </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Assignment Method and Overflow Handling */}
-        <div className="queue-columns">
-          <div className="queue-column">
-            <div className="queue-section">
-              <div className="section-header-inline">
-                <h2 className="section-title">Assignment method</h2>
-                <a href="#" className="learn-more-link-inline">Learn more</a>
-                <button className="see-more-button">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <circle cx="8" cy="8" r="1.5" />
-                    <circle cx="8" cy="3" r="1.5" />
-                    <circle cx="8" cy="13" r="1.5" />
-                  </svg>
-                  See more
-                </button>
-              </div>
-
-              <div className="assignment-method-content">
-                <div className="assignment-method-card">
-                  <div className="assignment-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#0078d4" />
-                    </svg>
-                  </div>
-                  <div className="assignment-details">
-                    <div className="assignment-title-row">
-                      <span className="assignment-title">Least active</span>
-                      <span className="read-only-badge">Read-only</span>
-                    </div>
-                    <p className="assignment-description">
-                      Work items will be prioritized in the order they enter the queue. Among the representatives who match skills, presence, and capacity, work will be assigned to the representative who is least active across voice and messaging queues. <a href="#">Learn more</a>
-                    </p>
-                  </div>
+                <div className="summary-item">
+                  <div className="summary-label">Overflow management</div>
+                  <div className="summary-value">{selectedProfileConfig.overflowManagement}</div>
+                </div>
+                <div className="summary-item">
+                  <div className="summary-label">Conversation timeout rules</div>
+                  <div className="summary-value">{selectedProfileConfig.conversationTimeoutRules}</div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="queue-column">
-            <div className="queue-section">
-              <h2 className="section-title">Overflow handling</h2>
-              <div className="overflow-handling-content">
-                <p className="section-description">
-                  Define conditions for queue overflows and actions to resolve them. <a href="#">Learn more</a>
-                </p>
-                <button className="add-condition-button">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M8 3v10M3 8h10" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                  Add condition-action pair
-                </button>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Operation Hours Section */}

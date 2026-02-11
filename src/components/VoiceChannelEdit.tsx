@@ -10,11 +10,20 @@ const VoiceChannelEdit: React.FC = () => {
   const [channelDetailsExpanded, setChannelDetailsExpanded] = useState(true);
 
   // Form state
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [region, setRegion] = useState('');
-  const [isTollFree, setIsTollFree] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('+1 (555) 123-4567');
+  const [region, setRegion] = useState('US East');
+  const [isTollFree, setIsTollFree] = useState(true);
+  const [canMakeCalls, setCanMakeCalls] = useState(true);
+  const [canReceiveCalls, setCanReceiveCalls] = useState(true);
   const [primaryLanguage, setPrimaryLanguage] = useState('English');
   const [additionalLanguages, setAdditionalLanguages] = useState<string[]>([]);
+  const [operatingHoursEnabled, setOperatingHoursEnabled] = useState(false);
+  const [operatingHours, setOperatingHours] = useState('24/7');
+  const [recordingMode, setRecordingMode] = useState('none');
+  const [autoStart, setAutoStart] = useState(false);
+  const [allowCSRPauseResume, setAllowCSRPauseResume] = useState(false);
+  const [allowAutoHoldPauseResume, setAllowAutoHoldPauseResume] = useState(false);
+  const [showTranscriptByDefault, setShowTranscriptByDefault] = useState(false);
   const [selectedConversationFlow, setSelectedConversationFlow] = useState('');
   const [selectedAIAgent, setSelectedAIAgent] = useState('');
   const [showVisualizer, setShowVisualizer] = useState(true);
@@ -137,51 +146,41 @@ const VoiceChannelEdit: React.FC = () => {
                 <div className="form-group-section">
                   <h3 className="subsection-title">Phone number configuration</h3>
 
-                  <div className="form-group">
-                    <label className="form-label">
-                      Phone number <span className="required">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      className="form-input"
-                      placeholder="+1 (555) 123-4567"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                    />
-                    <p className="form-help-text">Enter the phone number for this voice channel</p>
+                  <div className="phone-number-display-card">
+                    <div className="phone-number-details">
+                      <div className="phone-detail-row">
+                        <span className="detail-label">Phone number:</span>
+                        <span className="detail-value">{phoneNumber}</span>
+                      </div>
+                      <div className="phone-detail-row">
+                        <span className="detail-label">Region:</span>
+                        <span className="detail-value">{region}</span>
+                      </div>
+                      <div className="phone-detail-row">
+                        <span className="detail-label">Toll-free:</span>
+                        <span className="detail-value">{isTollFree ? 'Yes' : 'No'}</span>
+                      </div>
+                      <div className="phone-detail-row">
+                        <span className="detail-label">Call capabilities:</span>
+                        <span className="detail-value">
+                          {canMakeCalls && canReceiveCalls && 'Can make and receive calls'}
+                          {canMakeCalls && !canReceiveCalls && 'Can make calls only'}
+                          {!canMakeCalls && canReceiveCalls && 'Can receive calls only'}
+                          {!canMakeCalls && !canReceiveCalls && 'No call capabilities'}
+                        </span>
+                      </div>
+                    </div>
+                    <button className="change-number-button">
+                      Change number
+                    </button>
                   </div>
+                </div>
 
-                  <div className="form-group">
-                    <label className="form-label">
-                      Region <span className="required">*</span>
-                    </label>
-                    <select
-                      className="form-select"
-                      value={region}
-                      onChange={(e) => setRegion(e.target.value)}
-                    >
-                      <option value="">Select a region</option>
-                      <option value="us-east">US East</option>
-                      <option value="us-west">US West</option>
-                      <option value="eu-central">EU Central</option>
-                      <option value="eu-west">EU West</option>
-                      <option value="asia-pacific">Asia Pacific</option>
-                    </select>
-                    <p className="form-help-text">Select the region for this phone number</p>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox"
-                        checked={isTollFree}
-                        onChange={(e) => setIsTollFree(e.target.checked)}
-                      />
-                      <span>Toll-free number</span>
-                    </label>
-                    <p className="form-help-text">Enable if this is a toll-free number</p>
-                  </div>
+                <div className="form-group-section">
+                  <h3 className="subsection-title">Representative call quality survey</h3>
+                  <p className="form-help-text">
+                    Ask CSR to provide call quality feedback at the end of a call <a href="#" className="inline-link">here</a>
+                  </p>
                 </div>
               </div>
             )}
@@ -261,67 +260,113 @@ const VoiceChannelEdit: React.FC = () => {
                   <h3 className="subsection-title">Channel operating hours</h3>
 
                   <div className="form-group">
-                    <label className="form-label">Operating hours</label>
-                    <select className="form-select">
-                      <option value="24/7">24/7 - Always available</option>
-                      <option value="business-hours">Business hours (9 AM - 5 PM)</option>
-                      <option value="extended-hours">Extended hours (7 AM - 9 PM)</option>
-                      <option value="custom">Custom schedule</option>
-                    </select>
-                    <p className="form-help-text">Set when this voice channel is available</p>
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        className="toggle-checkbox"
+                        checked={operatingHoursEnabled}
+                        onChange={(e) => setOperatingHoursEnabled(e.target.checked)}
+                      />
+                      <span className="toggle-switch"></span>
+                      <span className="toggle-text">Enable operating hours</span>
+                    </label>
+                    <p className="form-help-text">Restrict when this voice channel is available</p>
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Time zone</label>
-                    <select className="form-select">
-                      <option value="est">Eastern Time (ET)</option>
-                      <option value="cst">Central Time (CT)</option>
-                      <option value="mst">Mountain Time (MT)</option>
-                      <option value="pst">Pacific Time (PT)</option>
-                      <option value="utc">UTC</option>
-                    </select>
-                  </div>
+                  {operatingHoursEnabled && (
+                    <div className="form-group">
+                      <label className="form-label">Operating hours</label>
+                      <select
+                        className="form-select"
+                        value={operatingHours}
+                        onChange={(e) => setOperatingHours(e.target.value)}
+                      >
+                        <option value="24/7">24/7 - Always available</option>
+                        <option value="business-hours">Business hours (9 AM - 5 PM)</option>
+                        <option value="extended-hours">Extended hours (7 AM - 9 PM)</option>
+                        <option value="custom">Custom schedule</option>
+                      </select>
+                      <p className="form-help-text">Set when this voice channel is available</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group-section">
                   <h3 className="subsection-title">Recording and transcription</h3>
 
                   <div className="form-group">
-                    <label className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox"
-                        defaultChecked
-                      />
-                      <span>Enable call recording</span>
-                    </label>
-                    <p className="form-help-text">Record all calls for quality and training purposes</p>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox"
-                        defaultChecked
-                      />
-                      <span>Enable call transcription</span>
-                    </label>
-                    <p className="form-help-text">Automatically transcribe calls to text</p>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Recording retention period</label>
-                    <select className="form-select">
-                      <option value="30">30 days</option>
-                      <option value="60">60 days</option>
-                      <option value="90">90 days</option>
-                      <option value="180">180 days</option>
-                      <option value="365">1 year</option>
-                      <option value="forever">Indefinitely</option>
+                    <label className="form-label">Recording mode</label>
+                    <select
+                      className="form-select"
+                      value={recordingMode}
+                      onChange={(e) => setRecordingMode(e.target.value)}
+                    >
+                      <option value="none">None</option>
+                      <option value="transcription">Transcription</option>
+                      <option value="transcription-and-recording">Transcription and recording</option>
                     </select>
-                    <p className="form-help-text">How long to keep call recordings</p>
+                    <p className="form-help-text">Select the recording mode for calls</p>
                   </div>
+
+                  {recordingMode !== 'none' && (
+                    <>
+                      <div className="form-group">
+                        <label className="toggle-label">
+                          <input
+                            type="checkbox"
+                            className="toggle-checkbox"
+                            checked={autoStart}
+                            onChange={(e) => setAutoStart(e.target.checked)}
+                          />
+                          <span className="toggle-switch"></span>
+                          <span className="toggle-text">Automatically start</span>
+                        </label>
+                        <p className="form-help-text">Start recording/transcription automatically when call begins</p>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="toggle-label">
+                          <input
+                            type="checkbox"
+                            className="toggle-checkbox"
+                            checked={allowCSRPauseResume}
+                            onChange={(e) => setAllowCSRPauseResume(e.target.checked)}
+                          />
+                          <span className="toggle-switch"></span>
+                          <span className="toggle-text">Allow CSR to pause and resume</span>
+                        </label>
+                        <p className="form-help-text">Enable customer service representatives to manually control recording</p>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="toggle-label">
+                          <input
+                            type="checkbox"
+                            className="toggle-checkbox"
+                            checked={allowAutoHoldPauseResume}
+                            onChange={(e) => setAllowAutoHoldPauseResume(e.target.checked)}
+                          />
+                          <span className="toggle-switch"></span>
+                          <span className="toggle-text">Allow automatic pause and resume during hold</span>
+                        </label>
+                        <p className="form-help-text">Automatically pause recording when call is on hold</p>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="toggle-label">
+                          <input
+                            type="checkbox"
+                            className="toggle-checkbox"
+                            checked={showTranscriptByDefault}
+                            onChange={(e) => setShowTranscriptByDefault(e.target.checked)}
+                          />
+                          <span className="toggle-switch"></span>
+                          <span className="toggle-text">Show transcript by default</span>
+                        </label>
+                        <p className="form-help-text">Display transcript panel automatically during calls</p>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}

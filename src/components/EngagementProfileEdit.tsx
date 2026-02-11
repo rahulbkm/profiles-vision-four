@@ -12,14 +12,138 @@ const profileNames: { [key: string]: string } = {
   'profile6': 'Billing Support Profile'
 };
 
+interface AutomatedMessage {
+  id: string;
+  trigger: string;
+  message: string;
+}
+
+interface OverflowRule {
+  id: string;
+  trigger: string;
+  action: string;
+}
+
+interface TimeoutRule {
+  id: string;
+  triggerType: string;
+  timeThreshold: string;
+  actionType: string;
+  messageRecipient?: string;
+  messageText?: string;
+  messageLanguage?: string;
+  conversationState?: string;
+}
+
 const EngagementProfileEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('automatedMessages');
-  const [consultEnabled, setConsultEnabled] = useState(true);
-  const [transferEnabled, setTransferEnabled] = useState(true);
+  const [consultExternalPhone, setConsultExternalPhone] = useState(false);
+  const [consultExternalTeams, setConsultExternalTeams] = useState(false);
+  const [transferExternalPhone, setTransferExternalPhone] = useState(false);
+  const [useBridgedTransfer, setUseBridgedTransfer] = useState(false);
+  const [transferExternalTeams, setTransferExternalTeams] = useState(false);
+  const [automatedMessages, setAutomatedMessages] = useState<AutomatedMessage[]>([
+    { id: '1', trigger: 'agent-assigned', message: 'You are now connected with {AgentName}. How can I help you today?' },
+    { id: '2', trigger: 'average-wait-time', message: 'Your estimated wait time is {WaitTime} minutes. Thank you for your patience.' },
+    { id: '3', trigger: 'conversation-transferred', message: 'I\'m transferring you to a specialist who can better assist with your request. Please hold.' },
+    { id: '4', trigger: 'agent-ended-conversation', message: 'Thank you for contacting us. Your conversation has been ended. Have a great day!' },
+    { id: '5', trigger: 'customer-ended-conversation', message: 'The customer has ended the conversation.' },
+    { id: '6', trigger: 'position-in-queue', message: 'You are currently number {QueuePosition} in the queue. We appreciate your patience.' }
+  ]);
+  const [assignmentMethod, setAssignmentMethod] = useState('round-robin');
+  const [afterCallWorkSetting, setAfterCallWorkSetting] = useState('custom');
+  const [overflowBeforeRules, setOverflowBeforeRules] = useState<OverflowRule[]>([
+    { id: '1', trigger: '', action: '' }
+  ]);
+  const [overflowAfterRules, setOverflowAfterRules] = useState<OverflowRule[]>([
+    { id: '1', trigger: '', action: '' }
+  ]);
+  const [notifyQueuePosition, setNotifyQueuePosition] = useState(false);
+  const [notifyWaitTime, setNotifyWaitTime] = useState(false);
+  const [timeoutRules, setTimeoutRules] = useState<TimeoutRule[]>([
+    { id: '1', triggerType: '', timeThreshold: '', actionType: '' }
+  ]);
 
   const profileName = id ? profileNames[id] || 'Unknown Profile' : 'Unknown Profile';
+
+  const addAutomatedMessage = () => {
+    const newMessage: AutomatedMessage = {
+      id: Date.now().toString(),
+      trigger: '',
+      message: ''
+    };
+    setAutomatedMessages([...automatedMessages, newMessage]);
+  };
+
+  const deleteAutomatedMessage = (messageId: string) => {
+    setAutomatedMessages(automatedMessages.filter(msg => msg.id !== messageId));
+  };
+
+  const updateAutomatedMessage = (messageId: string, field: 'trigger' | 'message', value: string) => {
+    setAutomatedMessages(automatedMessages.map(msg =>
+      msg.id === messageId ? { ...msg, [field]: value } : msg
+    ));
+  };
+
+  const addOverflowBeforeRule = () => {
+    const newRule: OverflowRule = {
+      id: Date.now().toString(),
+      trigger: '',
+      action: ''
+    };
+    setOverflowBeforeRules([...overflowBeforeRules, newRule]);
+  };
+
+  const deleteOverflowBeforeRule = (ruleId: string) => {
+    setOverflowBeforeRules(overflowBeforeRules.filter(rule => rule.id !== ruleId));
+  };
+
+  const updateOverflowBeforeRule = (ruleId: string, field: 'trigger' | 'action', value: string) => {
+    setOverflowBeforeRules(overflowBeforeRules.map(rule =>
+      rule.id === ruleId ? { ...rule, [field]: value } : rule
+    ));
+  };
+
+  const addOverflowAfterRule = () => {
+    const newRule: OverflowRule = {
+      id: Date.now().toString(),
+      trigger: '',
+      action: ''
+    };
+    setOverflowAfterRules([...overflowAfterRules, newRule]);
+  };
+
+  const deleteOverflowAfterRule = (ruleId: string) => {
+    setOverflowAfterRules(overflowAfterRules.filter(rule => rule.id !== ruleId));
+  };
+
+  const updateOverflowAfterRule = (ruleId: string, field: 'trigger' | 'action', value: string) => {
+    setOverflowAfterRules(overflowAfterRules.map(rule =>
+      rule.id === ruleId ? { ...rule, [field]: value } : rule
+    ));
+  };
+
+  const addTimeoutRule = () => {
+    const newRule: TimeoutRule = {
+      id: Date.now().toString(),
+      triggerType: '',
+      timeThreshold: '',
+      actionType: ''
+    };
+    setTimeoutRules([...timeoutRules, newRule]);
+  };
+
+  const deleteTimeoutRule = (ruleId: string) => {
+    setTimeoutRules(timeoutRules.filter(rule => rule.id !== ruleId));
+  };
+
+  const updateTimeoutRule = (ruleId: string, field: keyof TimeoutRule, value: string) => {
+    setTimeoutRules(timeoutRules.map(rule =>
+      rule.id === ruleId ? { ...rule, [field]: value } : rule
+    ));
+  };
 
   return (
     <div className="voice-channel-edit-page">
@@ -63,6 +187,12 @@ const EngagementProfileEdit: React.FC = () => {
                 Automated messages
               </button>
               <button
+                className={`edit-tab ${activeTab === 'customerWaitTime' ? 'active' : ''}`}
+                onClick={() => setActiveTab('customerWaitTime')}
+              >
+                Customer wait time
+              </button>
+              <button
                 className={`edit-tab ${activeTab === 'notifications' ? 'active' : ''}`}
                 onClick={() => setActiveTab('notifications')}
               >
@@ -104,6 +234,18 @@ const EngagementProfileEdit: React.FC = () => {
               >
                 Session template
               </button>
+              <button
+                className={`edit-tab ${activeTab === 'overflowManagement' ? 'active' : ''}`}
+                onClick={() => setActiveTab('overflowManagement')}
+              >
+                Overflow management
+              </button>
+              <button
+                className={`edit-tab ${activeTab === 'timeoutRules' ? 'active' : ''}`}
+                onClick={() => setActiveTab('timeoutRules')}
+              >
+                Conversation timeout rules
+              </button>
             </nav>
           </aside>
 
@@ -116,103 +258,101 @@ const EngagementProfileEdit: React.FC = () => {
                   interaction. These messages keep customers informed about their conversation status and wait times.
                 </p>
 
-                <div className="greetings-list">
-                  <div className="greeting-item">
-                    <div className="greeting-header">
-                      <span className="greeting-trigger">Agent assigned</span>
-                      <button className="edit-greeting-button">
+                <div className="automated-messages-list">
+                  {automatedMessages.map((message) => (
+                    <div key={message.id} className="automated-message-row">
+                      <div className="message-trigger-dropdown">
+                        <select
+                          className="form-select"
+                          value={message.trigger}
+                          onChange={(e) => updateAutomatedMessage(message.id, 'trigger', e.target.value)}
+                        >
+                          <option value="">Select trigger</option>
+                          <option value="agent-assigned">Agent assigned</option>
+                          <option value="average-wait-time">Average wait time</option>
+                          <option value="conversation-transferred">Conversation transferred</option>
+                          <option value="agent-ended-conversation">Agent ended conversation</option>
+                          <option value="customer-ended-conversation">Customer ended conversation</option>
+                          <option value="position-in-queue">Position in queue</option>
+                          <option value="on-hold">On hold</option>
+                          <option value="back-from-hold">Back from hold</option>
+                          <option value="consultation-started">Consultation started</option>
+                        </select>
+                      </div>
+                      <div className="message-text-input">
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="Enter message"
+                          value={message.message}
+                          onChange={(e) => updateAutomatedMessage(message.id, 'message', e.target.value)}
+                        />
+                      </div>
+                      <button
+                        className="delete-message-button"
+                        onClick={() => deleteAutomatedMessage(message.id)}
+                        title="Delete message"
+                      >
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 2.793L10.5 3 4 9.5V11h1.5l6.5-6.5-.707-.707z" />
+                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                          <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
                         </svg>
-                        Edit
                       </button>
                     </div>
-                    <div className="greeting-message">
-                      "You are now connected with {'{'} AgentName {'}'}. How can I help you today?"
-                    </div>
-                  </div>
+                  ))}
 
-                  <div className="greeting-item">
-                    <div className="greeting-header">
-                      <span className="greeting-trigger">Average wait time</span>
-                      <button className="edit-greeting-button">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 2.793L10.5 3 4 9.5V11h1.5l6.5-6.5-.707-.707z" />
-                        </svg>
-                        Edit
-                      </button>
-                    </div>
-                    <div className="greeting-message">
-                      "Your estimated wait time is {'{'} WaitTime {'}'} minutes. Thank you for your patience."
-                    </div>
-                  </div>
-
-                  <div className="greeting-item">
-                    <div className="greeting-header">
-                      <span className="greeting-trigger">Conversation transferred</span>
-                      <button className="edit-greeting-button">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 2.793L10.5 3 4 9.5V11h1.5l6.5-6.5-.707-.707z" />
-                        </svg>
-                        Edit
-                      </button>
-                    </div>
-                    <div className="greeting-message">
-                      "I'm transferring you to a specialist who can better assist with your request. Please hold."
-                    </div>
-                  </div>
-
-                  <div className="greeting-item">
-                    <div className="greeting-header">
-                      <span className="greeting-trigger">Agent ended conversation</span>
-                      <button className="edit-greeting-button">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 2.793L10.5 3 4 9.5V11h1.5l6.5-6.5-.707-.707z" />
-                        </svg>
-                        Edit
-                      </button>
-                    </div>
-                    <div className="greeting-message">
-                      "Thank you for contacting us. Your conversation has been ended. Have a great day!"
-                    </div>
-                  </div>
-
-                  <div className="greeting-item">
-                    <div className="greeting-header">
-                      <span className="greeting-trigger">Customer ended conversation</span>
-                      <button className="edit-greeting-button">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 2.793L10.5 3 4 9.5V11h1.5l6.5-6.5-.707-.707z" />
-                        </svg>
-                        Edit
-                      </button>
-                    </div>
-                    <div className="greeting-message">
-                      "The customer has ended the conversation."
-                    </div>
-                  </div>
-
-                  <div className="greeting-item">
-                    <div className="greeting-header">
-                      <span className="greeting-trigger">Position in queue</span>
-                      <button className="edit-greeting-button">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 2.793L10.5 3 4 9.5V11h1.5l6.5-6.5-.707-.707z" />
-                        </svg>
-                        Edit
-                      </button>
-                    </div>
-                    <div className="greeting-message">
-                      "You are currently number {'{'} QueuePosition {'}'} in the queue. We appreciate your patience."
-                    </div>
-                  </div>
-
-                  <button className="add-greeting-button">
+                  <button className="add-greeting-button" onClick={addAutomatedMessage}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                       <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                     Add message trigger
                   </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'customerWaitTime' && (
+              <div className="form-section">
+                <h2 className="section-label">Customer Wait Time</h2>
+                <p className="form-help-text">
+                  Configure what information customers receive while waiting in the queue. These notifications
+                  help manage customer expectations and improve their experience during wait times.
+                </p>
+
+                <div className="form-group-section">
+                  <div className="form-group">
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        className="toggle-checkbox"
+                        checked={notifyQueuePosition}
+                        onChange={(e) => setNotifyQueuePosition(e.target.checked)}
+                      />
+                      <span className="toggle-switch"></span>
+                      <span className="toggle-text">Notify customer position in queue</span>
+                    </label>
+                    <p className="form-help-text">
+                      Inform customers of their current position in the queue so they know how many customers
+                      are ahead of them
+                    </p>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        className="toggle-checkbox"
+                        checked={notifyWaitTime}
+                        onChange={(e) => setNotifyWaitTime(e.target.checked)}
+                      />
+                      <span className="toggle-switch"></span>
+                      <span className="toggle-text">Notify average wait time</span>
+                    </label>
+                    <p className="form-help-text">
+                      Provide customers with an estimated average wait time based on current queue conditions
+                      and historical data
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -381,27 +521,70 @@ const EngagementProfileEdit: React.FC = () => {
                 <div className="form-group-section">
                   <div className="form-group">
                     <label className="form-label">Assignment method</label>
-                    <select className="form-select" defaultValue="round-robin">
+                    <select
+                      className="form-select"
+                      value={assignmentMethod}
+                      onChange={(e) => setAssignmentMethod(e.target.value)}
+                    >
                       <option value="round-robin">Round robin - Distribute evenly across all agents</option>
                       <option value="highest-capacity">Highest capacity - Assign to agent with most availability</option>
                       <option value="least-active">Least active - Assign to agent with least recent activity</option>
                       <option value="custom">Custom assignment rules</option>
                     </select>
-                    <p className="form-help-text">
-                      <strong>Round robin:</strong> Distributes work evenly among all eligible agents in rotation.
-                      <br />
-                      <strong>Highest capacity:</strong> Prioritizes agents with the most available capacity to handle additional work.
-                      <br />
-                      <strong>Least active:</strong> Assigns work to the agent who has been idle longest or handled the fewest recent interactions.
-                      <br />
-                      <strong>Custom:</strong> Use custom business rules to determine assignment logic.
-                    </p>
+
+                    {assignmentMethod === 'round-robin' && (
+                      <p className="form-help-text">
+                        Distributes work evenly among all eligible agents in rotation.
+                      </p>
+                    )}
+
+                    {assignmentMethod === 'highest-capacity' && (
+                      <p className="form-help-text">
+                        Prioritizes agents with the most available capacity to handle additional work.
+                      </p>
+                    )}
+
+                    {assignmentMethod === 'least-active' && (
+                      <p className="form-help-text">
+                        Assigns work to the agent who has been idle longest or handled the fewest recent interactions.
+                      </p>
+                    )}
+
+                    {assignmentMethod === 'custom' && (
+                      <p className="form-help-text">
+                        Use custom business rules to determine assignment logic.
+                      </p>
+                    )}
                   </div>
+
+                  {assignmentMethod === 'custom' && (
+                    <>
+                      <div className="custom-assignment-card">
+                        <div className="custom-card-header">
+                          <h3 className="custom-card-title">Prioritization rules</h3>
+                          <button className="configure-link-button">Configure</button>
+                        </div>
+                        <p className="custom-card-description">
+                          Define rules to prioritize which work items should be assigned first based on customer attributes, wait time, or business priorities.
+                        </p>
+                      </div>
+
+                      <div className="custom-assignment-card">
+                        <div className="custom-card-header">
+                          <h3 className="custom-card-title">Assignment rulesets</h3>
+                          <button className="configure-link-button">Configure</button>
+                        </div>
+                        <p className="custom-card-description">
+                          Create custom rulesets to match work items with specific agents based on skills, attributes, or other criteria.
+                        </p>
+                      </div>
+                    </>
+                  )}
 
                   <div className="form-group">
                     <label className="checkbox-label">
                       <input type="checkbox" className="form-checkbox" defaultChecked />
-                      <span>Enable agent affinity</span>
+                      <span>Assign returning conversation to same representative</span>
                     </label>
                     <p className="form-help-text">
                       When enabled, attempts to assign returning customers to agents they've previously worked with
@@ -423,35 +606,50 @@ const EngagementProfileEdit: React.FC = () => {
                 <div className="form-group-section">
                   <div className="form-group">
                     <label className="form-label">After call work setting</label>
-                    <select className="form-select" defaultValue="custom">
+                    <select
+                      className="form-select"
+                      value={afterCallWorkSetting}
+                      onChange={(e) => setAfterCallWorkSetting(e.target.value)}
+                    >
                       <option value="always-block">Always block - ACW time always provided after calls</option>
                       <option value="never-block">Never block - No ACW time, immediate availability</option>
                       <option value="custom">Custom time - Specify ACW duration</option>
                     </select>
-                    <p className="form-help-text">
-                      <strong>Always block:</strong> Agents always receive ACW time after every interaction to complete
-                      post-call tasks without interruption.
-                      <br />
-                      <strong>Never block:</strong> Agents are immediately available for new work after ending an interaction.
-                      Best for high-volume environments where post-call work is minimal.
-                      <br />
-                      <strong>Custom time:</strong> Define a specific duration for ACW based on your organization's needs.
-                    </p>
+
+                    {afterCallWorkSetting === 'always-block' && (
+                      <p className="form-help-text">
+                        Agents always receive ACW time after every interaction to complete post-call tasks without interruption.
+                      </p>
+                    )}
+
+                    {afterCallWorkSetting === 'never-block' && (
+                      <p className="form-help-text">
+                        Agents are immediately available for new work after ending an interaction. Best for high-volume environments where post-call work is minimal.
+                      </p>
+                    )}
+
+                    {afterCallWorkSetting === 'custom' && (
+                      <p className="form-help-text">
+                        Define a specific duration for ACW based on your organization's needs.
+                      </p>
+                    )}
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">ACW duration (seconds)</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      defaultValue="30"
-                      min="0"
-                      max="600"
-                    />
-                    <p className="form-help-text">
-                      Specify how long agents should remain unavailable for new work after completing an interaction (0-600 seconds)
-                    </p>
-                  </div>
+                  {afterCallWorkSetting === 'custom' && (
+                    <div className="form-group">
+                      <label className="form-label">ACW duration (seconds)</label>
+                      <input
+                        type="number"
+                        className="form-input"
+                        defaultValue="30"
+                        min="0"
+                        max="600"
+                      />
+                      <p className="form-help-text">
+                        Specify how long agents should remain unavailable for new work after completing an interaction (0-600 seconds)
+                      </p>
+                    </div>
+                  )}
 
                   <div className="form-group">
                     <label className="checkbox-label">
@@ -470,101 +668,97 @@ const EngagementProfileEdit: React.FC = () => {
               <div className="form-section">
                 <h2 className="section-label">Consult/Transfer Settings</h2>
                 <p className="form-help-text">
-                  Configure whether agents can consult with other agents or transfer conversations to other
-                  queues or agents. These settings control collaboration and escalation capabilities.
+                  Configure external consultation and transfer capabilities for agents to collaborate with
+                  external resources and escalate conversations when needed.
                 </p>
 
                 <div className="form-group-section">
-                  <h3 className="subsection-title">Consultation settings</h3>
+                  <h3 className="subsection-title">Consult</h3>
+
                   <div className="form-group">
-                    <label className="checkbox-label">
+                    <label className="toggle-label">
                       <input
                         type="checkbox"
-                        className="form-checkbox"
-                        checked={consultEnabled}
-                        onChange={(e) => setConsultEnabled(e.target.checked)}
+                        className="toggle-checkbox"
+                        checked={consultExternalPhone}
+                        onChange={(e) => setConsultExternalPhone(e.target.checked)}
                       />
-                      <span>Enable consult</span>
+                      <span className="toggle-switch"></span>
+                      <span className="toggle-text">External phone numbers</span>
                     </label>
                     <p className="form-help-text">
-                      Allow agents to consult with other agents while keeping the customer on hold. During a
-                      consult, agents can get expert advice or assistance without transferring the customer.
+                      Allow agents to consult with external phone numbers while keeping the customer on hold
                     </p>
                   </div>
 
-                  {consultEnabled && (
-                    <>
-                      <div className="form-group">
-                        <label className="checkbox-label">
-                          <input type="checkbox" className="form-checkbox" defaultChecked />
-                          <span>Allow consult with any agent</span>
-                        </label>
-                        <p className="form-help-text">
-                          Agents can consult with any available agent in the organization
-                        </p>
-                      </div>
-                      <div className="form-group">
-                        <label className="checkbox-label">
-                          <input type="checkbox" className="form-checkbox" defaultChecked />
-                          <span>Allow consult with specific queues</span>
-                        </label>
-                        <p className="form-help-text">
-                          Agents can request consultation from agents in specific queues
-                        </p>
-                      </div>
-                    </>
-                  )}
+                  <div className="form-group">
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        className="toggle-checkbox"
+                        checked={consultExternalTeams}
+                        onChange={(e) => setConsultExternalTeams(e.target.checked)}
+                      />
+                      <span className="toggle-switch"></span>
+                      <span className="toggle-text">External Microsoft Teams users</span>
+                    </label>
+                    <p className="form-help-text">
+                      Allow agents to consult with external Microsoft Teams users for expert assistance
+                    </p>
+                  </div>
                 </div>
 
                 <div className="form-group-section">
-                  <h3 className="subsection-title">Transfer settings</h3>
+                  <h3 className="subsection-title">Transfer</h3>
+
                   <div className="form-group">
-                    <label className="checkbox-label">
+                    <label className="toggle-label">
                       <input
                         type="checkbox"
-                        className="form-checkbox"
-                        checked={transferEnabled}
-                        onChange={(e) => setTransferEnabled(e.target.checked)}
+                        className="toggle-checkbox"
+                        checked={transferExternalPhone}
+                        onChange={(e) => setTransferExternalPhone(e.target.checked)}
                       />
-                      <span>Enable transfer</span>
+                      <span className="toggle-switch"></span>
+                      <span className="toggle-text">External phone numbers</span>
                     </label>
                     <p className="form-help-text">
-                      Allow agents to transfer conversations to other agents or queues. Transfers move the entire
-                      customer interaction to another agent who takes over the conversation.
+                      Allow agents to transfer conversations to external phone numbers
                     </p>
+
+                    {transferExternalPhone && (
+                      <div className="sub-checkbox-group">
+                        <label className="checkbox-label">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox"
+                            checked={useBridgedTransfer}
+                            onChange={(e) => setUseBridgedTransfer(e.target.checked)}
+                          />
+                          <span>Use bridged transfer</span>
+                        </label>
+                        <p className="form-help-text">
+                          Keep agent on the line during transfer to provide context before disconnecting
+                        </p>
+                      </div>
+                    )}
                   </div>
 
-                  {transferEnabled && (
-                    <>
-                      <div className="form-group">
-                        <label className="checkbox-label">
-                          <input type="checkbox" className="form-checkbox" defaultChecked />
-                          <span>Allow transfer to any agent</span>
-                        </label>
-                        <p className="form-help-text">
-                          Agents can transfer conversations directly to any available agent
-                        </p>
-                      </div>
-                      <div className="form-group">
-                        <label className="checkbox-label">
-                          <input type="checkbox" className="form-checkbox" defaultChecked />
-                          <span>Allow transfer to queues</span>
-                        </label>
-                        <p className="form-help-text">
-                          Agents can transfer conversations to other queues for specialized handling
-                        </p>
-                      </div>
-                      <div className="form-group">
-                        <label className="checkbox-label">
-                          <input type="checkbox" className="form-checkbox" />
-                          <span>Require supervisor approval for transfers</span>
-                        </label>
-                        <p className="form-help-text">
-                          All transfer requests must be approved by a supervisor before completion
-                        </p>
-                      </div>
-                    </>
-                  )}
+                  <div className="form-group">
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        className="toggle-checkbox"
+                        checked={transferExternalTeams}
+                        onChange={(e) => setTransferExternalTeams(e.target.checked)}
+                      />
+                      <span className="toggle-switch"></span>
+                      <span className="toggle-text">External Microsoft Teams users</span>
+                    </label>
+                    <p className="form-help-text">
+                      Allow agents to transfer conversations to external Microsoft Teams users
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -573,13 +767,14 @@ const EngagementProfileEdit: React.FC = () => {
               <div className="form-section">
                 <h2 className="section-label">Post-Call Survey</h2>
                 <p className="form-help-text">
-                  Configure automated post-call surveys to gather customer feedback after interactions. Select
-                  a Copilot Studio bot that will conduct the survey and collect customer satisfaction data.
+                  Configure automated post-call surveys to gather customer feedback after interactions. Surveys
+                  are operated by Microsoft Copilot Studio and will be delivered to customers at the end of
+                  each call to collect satisfaction data and insights.
                 </p>
 
                 <div className="form-group-section">
                   <div className="form-group">
-                    <label className="form-label">Survey bot</label>
+                    <label className="form-label">Customer feedback survey bot</label>
                     <select className="form-select" defaultValue="csat-bot">
                       <option value="">No survey - Skip post-call survey</option>
                       <option value="csat-bot">Customer Satisfaction Survey Bot</option>
@@ -589,41 +784,8 @@ const EngagementProfileEdit: React.FC = () => {
                       <option value="custom-survey-bot">Custom Survey Bot</option>
                     </select>
                     <p className="form-help-text">
-                      Select the Copilot Studio bot that will interact with customers after the call ends.
-                      The bot will ask predefined questions and collect responses for analysis.
-                    </p>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="checkbox-label">
-                      <input type="checkbox" className="form-checkbox" defaultChecked />
-                      <span>Enable survey for all calls</span>
-                    </label>
-                    <p className="form-help-text">
-                      When enabled, the survey is offered to all customers after call completion
-                    </p>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="checkbox-label">
-                      <input type="checkbox" className="form-checkbox" />
-                      <span>Allow customers to skip survey</span>
-                    </label>
-                    <p className="form-help-text">
-                      Customers can opt out of the survey if they don't wish to provide feedback
-                    </p>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Survey trigger condition</label>
-                    <select className="form-select" defaultValue="all-calls">
-                      <option value="all-calls">All calls - Survey after every call</option>
-                      <option value="resolved-only">Resolved calls only</option>
-                      <option value="duration-threshold">Calls exceeding duration threshold</option>
-                      <option value="random-sample">Random sample of calls</option>
-                    </select>
-                    <p className="form-help-text">
-                      Define when the survey should be triggered based on call characteristics
+                      Select a Microsoft Copilot Studio bot that will interact with customers after the call ends
+                      to collect feedback and satisfaction ratings.
                     </p>
                   </div>
 
@@ -651,7 +813,7 @@ const EngagementProfileEdit: React.FC = () => {
 
                 <div className="form-group-section">
                   <div className="form-group">
-                    <label className="form-label">Session template</label>
+                    <label className="form-label">Default session template</label>
                     <select className="form-select" defaultValue="default-voice">
                       <option value="default-voice">Default Voice Session Template</option>
                       <option value="omnichannel-session">Omnichannel Session Template</option>
@@ -662,53 +824,8 @@ const EngagementProfileEdit: React.FC = () => {
                       <option value="custom-session">Custom Session Template</option>
                     </select>
                     <p className="form-help-text">
-                      The session template determines the agent's workspace layout, including which customer
-                      information panels, knowledge base articles, and productivity tools are available during
-                      the interaction.
-                    </p>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Default tab</label>
-                    <select className="form-select" defaultValue="customer-summary">
-                      <option value="customer-summary">Customer Summary</option>
-                      <option value="case-details">Case Details</option>
-                      <option value="knowledge-base">Knowledge Base</option>
-                      <option value="timeline">Timeline</option>
-                      <option value="related-cases">Related Cases</option>
-                    </select>
-                    <p className="form-help-text">
-                      The default tab that opens when an agent accepts a new conversation
-                    </p>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="checkbox-label">
-                      <input type="checkbox" className="form-checkbox" defaultChecked />
-                      <span>Show customer information panel</span>
-                    </label>
-                    <p className="form-help-text">
-                      Display customer details, contact information, and interaction history
-                    </p>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="checkbox-label">
-                      <input type="checkbox" className="form-checkbox" defaultChecked />
-                      <span>Show knowledge base panel</span>
-                    </label>
-                    <p className="form-help-text">
-                      Provide quick access to knowledge articles and support documentation
-                    </p>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="checkbox-label">
-                      <input type="checkbox" className="form-checkbox" defaultChecked />
-                      <span>Show script guidance panel</span>
-                    </label>
-                    <p className="form-help-text">
-                      Display agent scripts and conversation guidance for consistent service delivery
+                      Select the default session template for agent workspaces. This template determines the layout,
+                      panels, and tools available to agents during customer interactions.
                     </p>
                   </div>
 
@@ -718,9 +835,302 @@ const EngagementProfileEdit: React.FC = () => {
                         <path d="M14 2H8v2h3.59L6 9.59 7.41 11 13 5.41V9h2V2z" />
                         <path d="M12 12H4V4h4V2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8h-2v4z" />
                       </svg>
-                      Customize session templates in App Profile Manager
+                      Create and manage session templates
                     </a>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'overflowManagement' && (
+              <div className="form-section">
+                <h2 className="section-label">Overflow Management</h2>
+                <p className="form-help-text">
+                  Configure how the system handles overflow situations when queues reach capacity or specific
+                  conditions are met. Define triggers and corresponding actions for both pre-queue and in-queue
+                  overflow scenarios to ensure customers receive appropriate service.
+                </p>
+
+                <div className="form-group-section">
+                  <h3 className="subsection-title">Overflow before conversation is queued</h3>
+                  <p className="form-help-text">
+                    Define what happens when overflow conditions are detected before a conversation enters the queue.
+                  </p>
+
+                  <div className="overflow-rules-list">
+                    {overflowBeforeRules.map((rule) => (
+                      <div key={rule.id} className="overflow-rule-row">
+                        <div className="overflow-trigger-action-row">
+                          <div className="overflow-trigger-group">
+                            <label className="form-label">Trigger</label>
+                            <select
+                              className="form-select"
+                              value={rule.trigger}
+                              onChange={(e) => updateOverflowBeforeRule(rule.id, 'trigger', e.target.value)}
+                            >
+                              <option value="">Select a trigger</option>
+                              <option value="out-of-hours">Out of operating hours</option>
+                              <option value="all-agents-offline">All agents offline</option>
+                              <option value="queue-full">Queue capacity reached</option>
+                              <option value="estimated-wait">Estimated wait time exceeds threshold</option>
+                            </select>
+                          </div>
+
+                          <div className="overflow-action-group">
+                            <label className="form-label">Action</label>
+                            <select
+                              className="form-select"
+                              value={rule.action}
+                              onChange={(e) => updateOverflowBeforeRule(rule.id, 'action', e.target.value)}
+                            >
+                              <option value="">Select an action</option>
+                              <option value="reject-call">Reject call with message</option>
+                              <option value="transfer-queue">Transfer to another queue</option>
+                              <option value="voicemail">Send to voicemail</option>
+                              <option value="callback">Offer callback option</option>
+                              <option value="play-message">Play message and disconnect</option>
+                            </select>
+                          </div>
+                        </div>
+                        <button
+                          className="delete-overflow-rule-button"
+                          onClick={() => deleteOverflowBeforeRule(rule.id)}
+                          title="Delete rule"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                            <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+
+                    <button className="add-overflow-rule-button" onClick={addOverflowBeforeRule}>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                      Add trigger-action pair
+                    </button>
+                  </div>
+                </div>
+
+                <div className="form-group-section">
+                  <h3 className="subsection-title">Overflow after conversation is in queue</h3>
+                  <p className="form-help-text">
+                    Define what happens when overflow conditions are detected while a conversation is waiting in the queue.
+                  </p>
+
+                  <div className="overflow-rules-list">
+                    {overflowAfterRules.map((rule) => (
+                      <div key={rule.id} className="overflow-rule-row">
+                        <div className="overflow-trigger-action-row">
+                          <div className="overflow-trigger-group">
+                            <label className="form-label">Trigger</label>
+                            <select
+                              className="form-select"
+                              value={rule.trigger}
+                              onChange={(e) => updateOverflowAfterRule(rule.id, 'trigger', e.target.value)}
+                            >
+                              <option value="">Select a trigger</option>
+                              <option value="wait-time-5">Wait time exceeds 5 minutes</option>
+                              <option value="wait-time-10">Wait time exceeds 10 minutes</option>
+                              <option value="wait-time-15">Wait time exceeds 15 minutes</option>
+                              <option value="wait-time-custom">Wait time exceeds custom duration</option>
+                              <option value="position-threshold">Queue position exceeds threshold</option>
+                              <option value="no-agents-available">No agents become available</option>
+                            </select>
+                          </div>
+
+                          <div className="overflow-action-group">
+                            <label className="form-label">Action</label>
+                            <select
+                              className="form-select"
+                              value={rule.action}
+                              onChange={(e) => updateOverflowAfterRule(rule.id, 'action', e.target.value)}
+                            >
+                              <option value="">Select an action</option>
+                              <option value="remain-queue">Remain in queue</option>
+                              <option value="transfer-queue">Transfer to another queue</option>
+                              <option value="escalate">Escalate to supervisor</option>
+                              <option value="callback">Offer callback option</option>
+                              <option value="voicemail">Send to voicemail</option>
+                            </select>
+                          </div>
+                        </div>
+                        <button
+                          className="delete-overflow-rule-button"
+                          onClick={() => deleteOverflowAfterRule(rule.id)}
+                          title="Delete rule"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                            <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+
+                    <button className="add-overflow-rule-button" onClick={addOverflowAfterRule}>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                      Add trigger-action pair
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'timeoutRules' && (
+              <div className="form-section">
+                <h2 className="section-label">Conversation Timeout Rules</h2>
+                <p className="form-help-text">
+                  Define timeout rules to automatically take action when either the customer service representative
+                  or the customer doesn't respond within a specified time period. These rules help maintain conversation
+                  flow and prevent stalled interactions.
+                </p>
+
+                <div className="timeout-rules-list">
+                  {timeoutRules.map((rule) => (
+                    <div key={rule.id} className="timeout-rule-card">
+                      <div className="timeout-rule-header">
+                        <h3 className="timeout-rule-title">Timeout Rule</h3>
+                        <button
+                          className="delete-timeout-rule-button"
+                          onClick={() => deleteTimeoutRule(rule.id)}
+                          title="Delete rule"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                            <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div className="timeout-rule-content">
+                        {/* Trigger Section */}
+                        <div className="timeout-section">
+                          <h4 className="timeout-section-label">Trigger</h4>
+                          <div className="timeout-trigger-row">
+                            <div className="timeout-field-group">
+                              <label className="form-label">Trigger type</label>
+                              <select
+                                className="form-select"
+                                value={rule.triggerType}
+                                onChange={(e) => updateTimeoutRule(rule.id, 'triggerType', e.target.value)}
+                              >
+                                <option value="">Select trigger type</option>
+                                <option value="csr-nonresponse">CSR non-response time</option>
+                                <option value="customer-nonresponse">Customer non-response time</option>
+                              </select>
+                            </div>
+
+                            <div className="timeout-field-group">
+                              <label className="form-label">Time threshold (minutes)</label>
+                              <input
+                                type="number"
+                                className="form-input"
+                                placeholder="e.g., 10"
+                                min="1"
+                                value={rule.timeThreshold}
+                                onChange={(e) => updateTimeoutRule(rule.id, 'timeThreshold', e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Section */}
+                        <div className="timeout-section">
+                          <h4 className="timeout-section-label">Action</h4>
+                          <div className="timeout-field-group">
+                            <label className="form-label">Action type</label>
+                            <select
+                              className="form-select"
+                              value={rule.actionType}
+                              onChange={(e) => updateTimeoutRule(rule.id, 'actionType', e.target.value)}
+                            >
+                              <option value="">Select action type</option>
+                              <option value="send-message">Send a message</option>
+                              <option value="change-state">Change conversation state</option>
+                            </select>
+                          </div>
+
+                          {rule.actionType === 'send-message' && (
+                            <div className="timeout-action-details">
+                              <div className="timeout-field-group">
+                                <label className="form-label">Recipient</label>
+                                <select
+                                  className="form-select"
+                                  value={rule.messageRecipient || ''}
+                                  onChange={(e) => updateTimeoutRule(rule.id, 'messageRecipient', e.target.value)}
+                                >
+                                  <option value="">Select recipient</option>
+                                  <option value="csr">CSR</option>
+                                  <option value="customer">Customer</option>
+                                </select>
+                              </div>
+
+                              <div className="timeout-field-group">
+                                <label className="form-label">Message text</label>
+                                <textarea
+                                  className="form-textarea"
+                                  placeholder="Enter the message to send"
+                                  rows={3}
+                                  value={rule.messageText || ''}
+                                  onChange={(e) => updateTimeoutRule(rule.id, 'messageText', e.target.value)}
+                                />
+                              </div>
+
+                              <div className="timeout-field-group">
+                                <label className="form-label">Language</label>
+                                <select
+                                  className="form-select"
+                                  value={rule.messageLanguage || ''}
+                                  onChange={(e) => updateTimeoutRule(rule.id, 'messageLanguage', e.target.value)}
+                                >
+                                  <option value="">Select language</option>
+                                  <option value="en">English</option>
+                                  <option value="es">Spanish</option>
+                                  <option value="fr">French</option>
+                                  <option value="de">German</option>
+                                  <option value="it">Italian</option>
+                                  <option value="pt">Portuguese</option>
+                                  <option value="zh">Chinese</option>
+                                  <option value="ja">Japanese</option>
+                                </select>
+                              </div>
+                            </div>
+                          )}
+
+                          {rule.actionType === 'change-state' && (
+                            <div className="timeout-action-details">
+                              <div className="timeout-field-group">
+                                <label className="form-label">Conversation state</label>
+                                <select
+                                  className="form-select"
+                                  value={rule.conversationState || ''}
+                                  onChange={(e) => updateTimeoutRule(rule.id, 'conversationState', e.target.value)}
+                                >
+                                  <option value="">Select state</option>
+                                  <option value="close">Close conversation</option>
+                                  <option value="wrap-up">Move to wrap-up</option>
+                                  <option value="waiting">Set to waiting</option>
+                                  <option value="escalate">Escalate conversation</option>
+                                </select>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <button className="add-timeout-rule-button" onClick={addTimeoutRule}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    Add timeout rule
+                  </button>
                 </div>
               </div>
             )}
