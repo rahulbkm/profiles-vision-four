@@ -2,33 +2,33 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './VoiceChannelEdit.css';
 
-// Map flow IDs to names
-const flowNames: { [key: string]: string } = {
-  'flow1': 'Standard Customer Service Flow',
-  'flow2': 'Sales Inquiry Flow',
-  'flow3': 'Technical Support Flow',
-  'flow4': 'VIP Customer Flow',
-  'flow5': 'After-Hours Flow',
-  'flow6': 'Emergency Response Flow',
-  'flow7': 'Billing Inquiry Flow',
-  'flow8': 'Multilingual Support Flow'
+// Map profile IDs to names
+const profileNames: { [key: string]: string } = {
+  'flow1': 'Standard Customer Service Profile',
+  'flow2': 'Sales Inquiry Profile',
+  'flow3': 'Technical Support Profile',
+  'flow4': 'VIP Customer Profile',
+  'flow5': 'After-Hours Profile',
+  'flow6': 'Emergency Response Profile',
+  'flow7': 'Billing Inquiry Profile',
+  'flow8': 'Multilingual Support Profile'
 };
 
-const ConversationFlowEdit: React.FC = () => {
+const ConversationProfileEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedAIAgent, setSelectedAIAgent] = useState('agent1');
   const [showVisualizer, setShowVisualizer] = useState(true);
 
-  const flowName = id ? flowNames[id] || 'Unknown Flow' : 'Unknown Flow';
+  const profileName = id ? profileNames[id] || 'Unknown Profile' : 'Unknown Profile';
 
   return (
     <div className="voice-channel-edit-page">
       <main className="main-content">
         <div className="page-header-bar">
           <div className="header-bar-left">
-            <button className="back-button" onClick={() => navigate('/conversation-flows')}>
+            <button className="back-button" onClick={() => navigate('/conversation-profiles')}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -60,8 +60,8 @@ const ConversationFlowEdit: React.FC = () => {
         </div>
 
         <div className="page-header">
-          <h1 className="edit-title">{flowName}</h1>
-          <p className="edit-subtitle">Flow ID: {id}</p>
+          <h1 className="edit-title">{profileName}</h1>
+          <p className="edit-subtitle">Profile ID: {id}</p>
         </div>
 
         <div className="edit-content-layout">
@@ -106,19 +106,19 @@ const ConversationFlowEdit: React.FC = () => {
                 <h2 className="section-label">Overview</h2>
 
                 <div className="form-group-section">
-                  <h3 className="subsection-title">Flow information</h3>
+                  <h3 className="subsection-title">Profile information</h3>
 
                   <div className="form-group">
                     <label className="form-label">
-                      Flow name <span className="required">*</span>
+                      Profile name <span className="required">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-input"
-                      value={flowName}
+                      value={profileName}
                       readOnly
                     />
-                    <p className="form-help-text">The name of this conversation flow</p>
+                    <p className="form-help-text">The name of this conversation profile</p>
                   </div>
 
                   <div className="form-group">
@@ -126,10 +126,10 @@ const ConversationFlowEdit: React.FC = () => {
                     <textarea
                       className="form-input"
                       rows={3}
-                      placeholder="Enter a description for this conversation flow"
-                      defaultValue="This conversation flow defines how incoming calls are handled, including AI agent interaction, call routing rules, queue assignments, and customer greetings."
+                      placeholder="Enter a description for this conversation profile"
+                      defaultValue="This conversation profile defines how incoming calls are handled, including AI agent interaction, call routing rules, queue assignments, and customer greetings."
                     />
-                    <p className="form-help-text">Describe the purpose and use case for this flow</p>
+                    <p className="form-help-text">Describe the purpose and use case for this profile</p>
                   </div>
 
                   <div className="form-group">
@@ -139,7 +139,7 @@ const ConversationFlowEdit: React.FC = () => {
                       <option value="inactive">Inactive</option>
                       <option value="draft">Draft</option>
                     </select>
-                    <p className="form-help-text">Set the status of this conversation flow</p>
+                    <p className="form-help-text">Set the status of this conversation profile</p>
                   </div>
                 </div>
               </div>
@@ -149,7 +149,7 @@ const ConversationFlowEdit: React.FC = () => {
               <div className="form-section">
                 <h2 className="section-label">AI Agent</h2>
 
-                <div className="conversation-flow-subsection">
+                <div className="conversation-profile-subsection">
                   <h3 className="card-title">AI agent configuration</h3>
                   <div className="form-group">
                     <label className="form-label">Select AI agent</label>
@@ -211,7 +211,7 @@ const ConversationFlowEdit: React.FC = () => {
               <div className="form-section">
                 <h2 className="section-label">Work Classification Rules</h2>
 
-                <div className="conversation-flow-subsection">
+                <div className="conversation-profile-subsection">
                   <h3 className="card-title">Classification rulesets</h3>
                   <p className="form-help-text">
                     Configure rules to classify and categorize incoming calls. These rules help determine
@@ -264,7 +264,7 @@ const ConversationFlowEdit: React.FC = () => {
               <div className="form-section">
                 <h2 className="section-label">Route-to-Queue Ruleset</h2>
 
-                <div className="conversation-flow-subsection">
+                <div className="conversation-profile-subsection">
                   <h3 className="card-title">Queue routing configuration</h3>
                   <div className="form-group">
                     <a href="#" className="ruleset-link primary-ruleset">
@@ -322,7 +322,7 @@ const ConversationFlowEdit: React.FC = () => {
               <div className="form-section">
                 <h2 className="section-label">Greetings Messages</h2>
 
-                <div className="conversation-flow-subsection">
+                <div className="conversation-profile-subsection">
                   <h3 className="card-title">Greeting configuration</h3>
                   <p className="form-help-text">
                     Configure greeting messages that customers hear when they call. You can create different
@@ -390,7 +390,7 @@ const ConversationFlowEdit: React.FC = () => {
           {showVisualizer && (
             <div className="visualizer-panel">
               <div className="visualizer-header">
-                <h3 className="visualizer-title">Conversation Flow</h3>
+                <h3 className="visualizer-title">Conversation Profile</h3>
                 <button className="visualizer-close" onClick={() => setShowVisualizer(false)}>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -550,4 +550,4 @@ const ConversationFlowEdit: React.FC = () => {
   );
 };
 
-export default ConversationFlowEdit;
+export default ConversationProfileEdit;

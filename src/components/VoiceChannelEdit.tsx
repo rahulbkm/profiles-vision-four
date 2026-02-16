@@ -1,6 +1,97 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import './VoiceChannelEdit.css';
+
+// Engagement profiles data
+const engagementProfiles = [
+  { id: 'profile1', name: 'Standard Support Profile' },
+  { id: 'profile2', name: 'VIP Customer Profile' },
+  { id: 'profile3', name: 'Technical Support Profile' },
+  { id: 'profile4', name: 'Sales Team Profile' },
+  { id: 'profile5', name: 'After-Hours Profile' },
+  { id: 'profile6', name: 'Billing Support Profile' }
+];
+
+const engagementProfileConfigs: { [key: string]: any } = {
+  'profile1': {
+    automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Queue position and wait time notifications enabled',
+    notifications: '5 notification templates assigned',
+    workDistribution: 'Exact match skill algorithm, Default capacity profile',
+    assignmentMethod: 'Round robin with agent affinity',
+    afterCallWork: 'Custom time (30 seconds)',
+    consultTransfer: 'External phone and Teams enabled',
+    postCallSurvey: 'Customer Satisfaction Survey Bot',
+    sessionTemplate: 'Default Voice Session Template',
+    overflowManagement: '2 pre-queue rules, 3 in-queue rules configured',
+    conversationTimeoutRules: '2 timeout rules configured'
+  },
+  'profile2': {
+    automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Queue position notifications only',
+    notifications: '5 notification templates with priority alerts',
+    workDistribution: 'Exact match skill algorithm, High Volume Capacity Profile',
+    assignmentMethod: 'Highest capacity',
+    afterCallWork: 'Custom time (60 seconds)',
+    consultTransfer: 'External phone and Teams enabled',
+    postCallSurvey: 'Net Promoter Score (NPS) Bot',
+    sessionTemplate: 'Omnichannel Session Template',
+    overflowManagement: '1 pre-queue rule, 2 in-queue rules configured',
+    conversationTimeoutRules: '3 timeout rules configured'
+  },
+  'profile3': {
+    automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Wait time notifications only',
+    notifications: '5 notification templates assigned',
+    workDistribution: 'Nearest match skill algorithm, Default capacity profile',
+    assignmentMethod: 'Least active',
+    afterCallWork: 'Custom time (45 seconds)',
+    consultTransfer: 'External phone and Teams enabled',
+    postCallSurvey: 'Detailed Feedback Survey Bot',
+    sessionTemplate: 'Technical Support Session Template',
+    overflowManagement: '2 pre-queue rules, 2 in-queue rules configured',
+    conversationTimeoutRules: '1 timeout rule configured'
+  },
+  'profile4': {
+    automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Queue position and wait time notifications enabled',
+    notifications: '5 notification templates assigned',
+    workDistribution: 'Exact match skill algorithm, Default capacity profile',
+    assignmentMethod: 'Round robin',
+    afterCallWork: 'Custom time (30 seconds)',
+    consultTransfer: 'External phone and Teams enabled',
+    postCallSurvey: 'Quick Rating Bot (1-5 stars)',
+    sessionTemplate: 'Sales Session Template',
+    overflowManagement: '1 pre-queue rule, 1 in-queue rule configured',
+    conversationTimeoutRules: '2 timeout rules configured'
+  },
+  'profile5': {
+    automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Notifications disabled',
+    notifications: '5 notification templates assigned',
+    workDistribution: 'None skill matching, Low Volume Capacity Profile',
+    assignmentMethod: 'Round robin',
+    afterCallWork: 'Never block',
+    consultTransfer: 'Transfer only - external phone enabled',
+    postCallSurvey: 'No survey',
+    sessionTemplate: 'Minimal Session Template',
+    overflowManagement: '1 pre-queue rule configured',
+    conversationTimeoutRules: 'No timeout rules'
+  },
+  'profile6': {
+    automatedMessages: '6 message triggers configured',
+    customerWaitTime: 'Queue position and wait time notifications enabled',
+    notifications: '5 notification templates assigned',
+    workDistribution: 'Exact match skill algorithm, Default capacity profile',
+    assignmentMethod: 'Least active',
+    afterCallWork: 'Custom time (30 seconds)',
+    consultTransfer: 'External phone and Teams enabled',
+    postCallSurvey: 'Customer Satisfaction Survey Bot',
+    sessionTemplate: 'Customer Service Session Template',
+    overflowManagement: '2 pre-queue rules, 2 in-queue rules configured',
+    conversationTimeoutRules: '2 timeout rules configured'
+  }
+};
 
 const VoiceChannelEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,15 +115,17 @@ const VoiceChannelEdit: React.FC = () => {
   const [allowCSRPauseResume, setAllowCSRPauseResume] = useState(false);
   const [allowAutoHoldPauseResume, setAllowAutoHoldPauseResume] = useState(false);
   const [showTranscriptByDefault, setShowTranscriptByDefault] = useState(false);
-  const [selectedConversationFlow, setSelectedConversationFlow] = useState('');
+  const [selectedConversationProfile, setSelectedConversationProfile] = useState('');
   const [selectedAIAgent, setSelectedAIAgent] = useState('');
+  const [selectedEngagementProfile, setSelectedEngagementProfile] = useState('');
   const [showVisualizer, setShowVisualizer] = useState(true);
 
   // Track configuration completion
   const isChannelDetailsComplete = phoneNumber && region;
   const isAIAgentComplete = selectedAIAgent !== '';
-  const isWorkClassificationComplete = selectedConversationFlow !== '';
-  const isRouteToQueueComplete = selectedConversationFlow !== '';
+  const isWorkClassificationComplete = selectedConversationProfile !== '';
+  const isRouteToQueueComplete = selectedConversationProfile !== '';
+  const isEngagementProfileComplete = selectedEngagementProfile !== '';
 
   return (
     <div className="voice-channel-edit-page">
@@ -128,12 +221,20 @@ const VoiceChannelEdit: React.FC = () => {
                 )}
               </div>
 
-              {/* Conversation Flow */}
+              {/* Conversation Profile */}
               <button
-                className={`edit-tab ${activeTab === 'conversationFlow' ? 'active' : ''}`}
-                onClick={() => setActiveTab('conversationFlow')}
+                className={`edit-tab ${activeTab === 'conversationProfile' ? 'active' : ''}`}
+                onClick={() => setActiveTab('conversationProfile')}
               >
-                Conversation flow
+                Conversation profile
+              </button>
+
+              {/* Engagement Profile */}
+              <button
+                className={`edit-tab ${activeTab === 'engagementProfile' ? 'active' : ''}`}
+                onClick={() => setActiveTab('engagementProfile')}
+              >
+                Engagement profile
               </button>
             </nav>
           </aside>
@@ -371,47 +472,47 @@ const VoiceChannelEdit: React.FC = () => {
               </div>
             )}
 
-            {activeTab === 'conversationFlow' && (
+            {activeTab === 'conversationProfile' && (
               <div className="form-section">
-                <h2 className="section-label">Conversation Flow</h2>
+                <h2 className="section-label">Conversation Profile</h2>
 
-                {/* Main Conversation Flow Card */}
-                <div className="conversation-flow-main-card">
-                  <h3 className="card-title">Conversation flow configuration</h3>
+                {/* Main Conversation Profile Card */}
+                <div className="conversation-profile-main-card">
+                  <h3 className="card-title">Conversation profile configuration</h3>
 
-                  {/* Conversation Flow Selector */}
+                  {/* Conversation Profile Selector */}
                   <div className="form-group">
-                    <label className="form-label">Conversation flow</label>
+                    <label className="form-label">Conversation profile</label>
                     <select
                       className="form-select"
-                      value={selectedConversationFlow}
+                      value={selectedConversationProfile}
                       onChange={(e) => {
-                        setSelectedConversationFlow(e.target.value);
-                        // Automatically select default AI agent when conversation flow is selected
+                        setSelectedConversationProfile(e.target.value);
+                        // Automatically select default AI agent when conversation profile is selected
                         if (e.target.value) {
                           setSelectedAIAgent('agent1');
                         }
                       }}
                     >
-                      <option value="">Select a conversation flow</option>
-                      <option value="flow1">Standard Customer Service Flow</option>
-                      <option value="flow2">Sales Inquiry Flow</option>
-                      <option value="flow3">Technical Support Flow</option>
-                      <option value="flow4">VIP Customer Flow</option>
-                      <option value="flow5">After-Hours Flow</option>
+                      <option value="">Select a conversation profile</option>
+                      <option value="flow1">Standard Customer Service Profile</option>
+                      <option value="flow2">Sales Inquiry Profile</option>
+                      <option value="flow3">Technical Support Profile</option>
+                      <option value="flow4">VIP Customer Profile</option>
+                      <option value="flow5">After-Hours Profile</option>
                     </select>
                     <p className="form-help-text">
-                      Conversation flows define how incoming calls are handled, including AI agent interaction,
-                      call routing rules, queue assignments, and customer greetings. Select a flow to configure
+                      Conversation profiles define how incoming calls are handled, including AI agent interaction,
+                      call routing rules, queue assignments, and customer greetings. Select a profile to configure
                       how calls through this voice channel will be processed.
                     </p>
                   </div>
 
-                  {/* Show remaining sections only if a conversation flow is selected */}
-                  {selectedConversationFlow && (
-                    <div className="conversation-flow-content">
+                  {/* Show remaining sections only if a conversation profile is selected */}
+                  {selectedConversationProfile && (
+                    <div className="conversation-profile-content">
                       {/* AI Agent Section */}
-                      <div className="conversation-flow-subsection">
+                      <div className="conversation-profile-subsection">
                   <h3 className="card-title">AI agent</h3>
                   <div className="form-group">
                     <label className="form-label">Select AI agent</label>
@@ -439,7 +540,7 @@ const VoiceChannelEdit: React.FC = () => {
                       </div>
 
                       {/* Work Classification Rules Section */}
-                      <div className="conversation-flow-subsection">
+                      <div className="conversation-profile-subsection">
                   <h3 className="card-title">Work classification rules</h3>
                   <div className="rulesets-list">
                     <a href="#" className="ruleset-link">
@@ -477,7 +578,7 @@ const VoiceChannelEdit: React.FC = () => {
                       </div>
 
                       {/* Route-to-Queue Ruleset Section */}
-                      <div className="conversation-flow-subsection">
+                      <div className="conversation-profile-subsection">
                   <h3 className="card-title">Route-to-queue ruleset</h3>
                   <div className="form-group">
                     <a href="#" className="ruleset-link primary-ruleset">
@@ -500,7 +601,7 @@ const VoiceChannelEdit: React.FC = () => {
                       </div>
 
                       {/* Greetings Messages Section */}
-                      <div className="conversation-flow-subsection">
+                      <div className="conversation-profile-subsection">
                   <h3 className="card-title">Greetings messages</h3>
                   <div className="greetings-list">
                     <div className="greeting-item">
@@ -540,6 +641,103 @@ const VoiceChannelEdit: React.FC = () => {
                       Add greeting message
                     </button>
                   </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'engagementProfile' && (
+              <div className="form-section">
+                <h2 className="section-label">Engagement Profile</h2>
+
+                <div className="conversation-profile-main-card">
+                  <h3 className="card-title">Engagement profile configuration</h3>
+
+                  <p className="form-help-text" style={{ marginBottom: '20px', fontSize: '14px', lineHeight: '1.6' }}>
+                    Engagement profiles define how agents and customers interact during conversations, including automated messages,
+                    notifications, work distribution rules, assignment methods, and post-interaction settings. The engagement profile
+                    selected here will be the <strong>default profile</strong> for this voice channel. This can be overridden at the
+                    queue level by associating a queue with a different engagement profile.
+                  </p>
+
+                  <div className="form-group">
+                    <label className="form-label">Select engagement profile</label>
+                    <select
+                      className="form-select"
+                      value={selectedEngagementProfile}
+                      onChange={(e) => setSelectedEngagementProfile(e.target.value)}
+                    >
+                      <option value="">Choose an engagement profile</option>
+                      {engagementProfiles.map((profile) => (
+                        <option key={profile.id} value={profile.id}>
+                          {profile.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="form-help-text">
+                      Select the default engagement profile for this voice channel
+                    </p>
+                  </div>
+
+                  {selectedEngagementProfile && engagementProfileConfigs[selectedEngagementProfile] && (
+                    <div className="engagement-profile-summary">
+                      <div className="summary-header">
+                        <h3 className="summary-title">Configuration Summary</h3>
+                        <Link to={`/engagement-profile/${selectedEngagementProfile}`} className="edit-profile-link">
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M14 2H8v2h3.59L6 9.59 7.41 11 13 5.41V9h2V2z" />
+                            <path d="M12 12H4V4h4V2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8h-2v4z" />
+                          </svg>
+                          View Details
+                        </Link>
+                      </div>
+                      <div className="summary-grid">
+                        <div className="summary-item">
+                          <div className="summary-label">Automated messages</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].automatedMessages}</div>
+                        </div>
+                        <div className="summary-item">
+                          <div className="summary-label">Customer wait time</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].customerWaitTime}</div>
+                        </div>
+                        <div className="summary-item">
+                          <div className="summary-label">Notifications</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].notifications}</div>
+                        </div>
+                        <div className="summary-item">
+                          <div className="summary-label">Work distribution</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].workDistribution}</div>
+                        </div>
+                        <div className="summary-item">
+                          <div className="summary-label">Assignment method</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].assignmentMethod}</div>
+                        </div>
+                        <div className="summary-item">
+                          <div className="summary-label">After call work</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].afterCallWork}</div>
+                        </div>
+                        <div className="summary-item">
+                          <div className="summary-label">Consult/Transfer</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].consultTransfer}</div>
+                        </div>
+                        <div className="summary-item">
+                          <div className="summary-label">Post-call survey</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].postCallSurvey}</div>
+                        </div>
+                        <div className="summary-item">
+                          <div className="summary-label">Session template</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].sessionTemplate}</div>
+                        </div>
+                        <div className="summary-item">
+                          <div className="summary-label">Overflow management</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].overflowManagement}</div>
+                        </div>
+                        <div className="summary-item">
+                          <div className="summary-label">Conversation timeout rules</div>
+                          <div className="summary-value">{engagementProfileConfigs[selectedEngagementProfile].conversationTimeoutRules}</div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -591,6 +789,13 @@ const VoiceChannelEdit: React.FC = () => {
                           <div className="node-title">Channel Details</div>
                           <div className="node-subtitle">Phone: {phoneNumber}</div>
                           <div className="node-subtitle">Region: {region}</div>
+                          {isEngagementProfileComplete && (
+                            <div className="node-details">
+                              <span className="detail-badge">
+                                {engagementProfiles.find(p => p.id === selectedEngagementProfile)?.name || 'Engagement Profile'}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                       <div className="flow-connector"></div>

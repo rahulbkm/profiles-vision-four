@@ -5,7 +5,7 @@ import './VoiceChannels.css';
 interface VoiceChannelData {
   id: string;
   name: string;
-  conversationFlow: string;
+  conversationProfile: string;
   owner: string;
   createdOn: string;
 }
@@ -14,70 +14,70 @@ const voiceChannelsData: VoiceChannelData[] = [
   {
     id: 'v1',
     name: 'Customer Support Voice',
-    conversationFlow: 'Standard Customer Service Flow',
+    conversationProfile: 'Standard Customer Service Profile',
     owner: 'Aurora365 User6',
     createdOn: '9/10/2025 1:30 PM'
   },
   {
     id: 'v2',
     name: 'Sales Voice Channel',
-    conversationFlow: 'Sales Inquiry Flow',
+    conversationProfile: 'Sales Inquiry Profile',
     owner: 'Aurora365 User6',
     createdOn: '8/14/2025 4:44 PM'
   },
   {
     id: 'v3',
     name: 'Technical Support Voice',
-    conversationFlow: 'Technical Support Flow',
+    conversationProfile: 'Technical Support Profile',
     owner: 'Aurora365 User6',
     createdOn: '8/19/2025 6:28 PM'
   },
   {
     id: 'v4',
     name: 'Emergency Hotline',
-    conversationFlow: 'Emergency Response Flow',
+    conversationProfile: 'Emergency Response Profile',
     owner: 'Aurora365 User6',
     createdOn: '8/1/2025 12:32 PM'
   },
   {
     id: 'v5',
     name: 'General Inquiries Voice',
-    conversationFlow: 'Standard Customer Service Flow',
+    conversationProfile: 'Standard Customer Service Profile',
     owner: 'Aurora365 User6',
     createdOn: '8/5/2025 1:32 PM'
   },
   {
     id: 'v6',
     name: 'VIP Customer Line',
-    conversationFlow: 'VIP Customer Flow',
+    conversationProfile: 'VIP Customer Profile',
     owner: 'Aurora365 User6',
     createdOn: '8/7/2025 5:00 PM'
   },
   {
     id: 'v7',
     name: 'Billing Support Voice',
-    conversationFlow: 'Billing Inquiry Flow',
+    conversationProfile: 'Billing Inquiry Profile',
     owner: 'Aurora365 User6',
     createdOn: '1/22/2025 12:23 AM'
   },
   {
     id: 'v8',
     name: 'Product Inquiries Voice',
-    conversationFlow: 'Sales Inquiry Flow',
+    conversationProfile: 'Sales Inquiry Profile',
     owner: 'Aurora365 User6',
     createdOn: '10/10/2025 1:59 AM'
   },
   {
     id: 'v9',
     name: 'After-Hours Support',
-    conversationFlow: 'After-Hours Flow',
+    conversationProfile: 'After-Hours Profile',
     owner: 'Aurora365 User6',
     createdOn: '10/10/2025 1:01 AM'
   },
   {
     id: 'v10',
     name: 'International Support Voice',
-    conversationFlow: 'Multilingual Support Flow',
+    conversationProfile: 'Multilingual Support Profile',
     owner: 'Aurora365 User6',
     createdOn: '11/19/2025 11:19 AM'
   }
@@ -128,7 +128,7 @@ const VoiceChannels: React.FC = () => {
                   </svg>
                 </div>
               </th>
-              <th>Conversation flow</th>
+              <th>Conversation profile</th>
               <th>Owner</th>
               <th>CreatedOn</th>
             </tr>
@@ -141,7 +141,7 @@ const VoiceChannels: React.FC = () => {
                     {channel.name}
                   </Link>
                 </td>
-                <td>{channel.conversationFlow}</td>
+                <td>{channel.conversationProfile}</td>
                 <td>{channel.owner}</td>
                 <td>{channel.createdOn}</td>
               </tr>

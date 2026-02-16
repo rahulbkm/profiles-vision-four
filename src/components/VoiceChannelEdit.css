@@ -95,8 +95,8 @@
   border-color: #323130;
 }
 
-/* Conversation Flow Main Card Styles */
-.conversation-flow-main-card {
+/* Conversation Profile Main Card Styles */
+.conversation-profile-main-card {
   background-color: white;
   border: 1px solid #edebe9;
   border-radius: 4px;
@@ -114,15 +114,15 @@
   border-bottom: 1px solid #edebe9;
 }
 
-/* Conversation Flow Content Area */
-.conversation-flow-content {
+/* Conversation Profile Content Area */
+.conversation-profile-content {
   margin-top: 32px;
   padding-top: 24px;
   border-top: 2px solid #edebe9;
 }
 
-/* Conversation Flow Subsections */
-.conversation-flow-subsection {
+/* Conversation Profile Subsections */
+.conversation-profile-subsection {
   background-color: #faf9f8;
   border: 1px solid #e1dfdd;
   border-radius: 4px;
@@ -130,11 +130,11 @@
   margin-bottom: 20px;
 }
 
-.conversation-flow-subsection:last-child {
+.conversation-profile-subsection:last-child {
   margin-bottom: 0;
 }
 
-.conversation-flow-subsection .card-title {
+.conversation-profile-subsection .card-title {
   font-size: 15px;
   font-weight: 600;
   color: #323130;
@@ -938,4 +938,66 @@
 .toggle-text {
   user-select: none;
   font-weight: 500;
+}
+
+/* Engagement Profile Summary Styles */
+.engagement-profile-summary {
+  margin-top: 24px;
+  padding: 20px;
+  background-color: #faf9f8;
+  border: 1px solid #e1dfdd;
+  border-radius: 4px;
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.summary-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #323130;
+  margin: 0;
+}
+
+.edit-profile-link {
+  color: #0078d4;
+  text-decoration: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+
+.edit-profile-link:hover {
+  background-color: #edebe9;
+  text-decoration: underline;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 24px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #605e5c;
+  font-weight: 600;
+}
+
+.summary-value {
+  font-size: 14px;
+  color: #323130;
 }

@@ -82,16 +82,16 @@ const ChannelExperiences: React.FC = () => {
       <div className="content-header">
         <h1 className="page-title">Channel experiences</h1>
         <p className="page-description">
-          Define and manage how customers interact with your support channels through customized conversation flows and engagement profiles.
+          Define and manage how customers interact with your support channels through customized conversation profiles and engagement profiles.
         </p>
       </div>
 
       <CollapsibleSection title="Channel experiences">
         <ExperienceItem
-          title="Conversation flow"
+          title="Conversation profile"
           description="Design and manage the flow of conversations across your channels. Define automated responses, routing logic, and customer journey paths to create seamless and consistent support experiences."
           hasLearnMore
-          manageLink="/conversation-flows"
+          manageLink="/conversation-profiles"
         />
         <ExperienceItem
           title="Engagement profile"

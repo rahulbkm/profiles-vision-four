@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './VoiceChannels.css';
 
-interface ConversationFlowData {
+interface ConversationProfileData {
   id: string;
   name: string;
   description: string;
@@ -11,10 +11,10 @@ interface ConversationFlowData {
   status: string;
 }
 
-const conversationFlowsData: ConversationFlowData[] = [
+const conversationProfilesData: ConversationProfileData[] = [
   {
     id: 'flow1',
-    name: 'Standard Customer Service Flow',
+    name: 'Standard Customer Service Profile',
     description: 'General customer support workflow with AI agent assistance and queue routing',
     owner: 'Aurora365 User6',
     createdOn: '8/15/2025 9:30 AM',
@@ -22,15 +22,15 @@ const conversationFlowsData: ConversationFlowData[] = [
   },
   {
     id: 'flow2',
-    name: 'Sales Inquiry Flow',
-    description: 'Sales-focused conversation flow with lead qualification and CRM integration',
+    name: 'Sales Inquiry Profile',
+    description: 'Sales-focused conversation profile with lead qualification and CRM integration',
     owner: 'Aurora365 User6',
     createdOn: '8/20/2025 2:15 PM',
     status: 'Active'
   },
   {
     id: 'flow3',
-    name: 'Technical Support Flow',
+    name: 'Technical Support Profile',
     description: 'Technical troubleshooting workflow with skill-based routing and escalation',
     owner: 'Aurora365 User6',
     createdOn: '9/1/2025 11:00 AM',
@@ -38,7 +38,7 @@ const conversationFlowsData: ConversationFlowData[] = [
   },
   {
     id: 'flow4',
-    name: 'VIP Customer Flow',
+    name: 'VIP Customer Profile',
     description: 'Priority handling for VIP customers with dedicated agent routing',
     owner: 'Aurora365 User6',
     createdOn: '9/5/2025 3:45 PM',
@@ -46,23 +46,23 @@ const conversationFlowsData: ConversationFlowData[] = [
   },
   {
     id: 'flow5',
-    name: 'After-Hours Flow',
-    description: 'After-hours support workflow with voicemail and callback options',
+    name: 'After-Hours Profile',
+    description: 'After-hours support profile with voicemail and callback options',
     owner: 'Aurora365 User6',
     createdOn: '9/10/2025 10:20 AM',
     status: 'Active'
   },
   {
     id: 'flow6',
-    name: 'Emergency Response Flow',
-    description: 'High-priority emergency workflow with immediate escalation',
+    name: 'Emergency Response Profile',
+    description: 'High-priority emergency profile with immediate escalation',
     owner: 'Aurora365 User6',
     createdOn: '8/25/2025 1:00 PM',
     status: 'Active'
   },
   {
     id: 'flow7',
-    name: 'Billing Inquiry Flow',
+    name: 'Billing Inquiry Profile',
     description: 'Billing and payment support with secure payment processing',
     owner: 'Aurora365 User6',
     createdOn: '9/12/2025 4:30 PM',
@@ -70,15 +70,15 @@ const conversationFlowsData: ConversationFlowData[] = [
   },
   {
     id: 'flow8',
-    name: 'Multilingual Support Flow',
-    description: 'Multi-language support workflow with language detection and routing',
+    name: 'Multilingual Support Profile',
+    description: 'Multi-language support profile with language detection and routing',
     owner: 'Aurora365 User6',
     createdOn: '8/28/2025 8:15 AM',
     status: 'Active'
   }
 ];
 
-const ConversationFlows: React.FC = () => {
+const ConversationProfiles: React.FC = () => {
   return (
     <main className="main-content">
       <div className="toolbar">
@@ -87,7 +87,7 @@ const ConversationFlows: React.FC = () => {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
-            Add conversation flow
+            Add conversation profile
           </button>
           <button className="refresh-button">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -101,14 +101,14 @@ const ConversationFlows: React.FC = () => {
             <svg className="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <path d="M11.5 6.5a5 5 0 1 1-10 0 5 5 0 0 1 10 0zm-1.27 4.27a6 6 0 1 1 1.06-1.06l3.5 3.5-1.06 1.06-3.5-3.5z" />
             </svg>
-            <input type="text" placeholder="Search conversation flows" className="search-input-toolbar" />
+            <input type="text" placeholder="Search conversation profiles" className="search-input-toolbar" />
           </div>
         </div>
       </div>
 
       <div className="content-header">
         <Link to="/channel-experiences" className="breadcrumb">Channel experiences</Link>
-        <h1 className="page-title">Conversation flows</h1>
+        <h1 className="page-title">Conversation profiles</h1>
       </div>
 
       <div className="table-container">
@@ -117,7 +117,7 @@ const ConversationFlows: React.FC = () => {
             <tr>
               <th>
                 <div className="th-content">
-                  Flow Name
+                  Profile Name
                   <svg className="sort-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
                     <path d="M6 3l3 4H3l3-4z" />
                   </svg>
@@ -130,19 +130,19 @@ const ConversationFlows: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {conversationFlowsData.map((flow) => (
-              <tr key={flow.id}>
+            {conversationProfilesData.map((profile) => (
+              <tr key={profile.id}>
                 <td>
-                  <Link to={`/conversation-flow/${flow.id}`} className="table-link">
-                    {flow.name}
+                  <Link to={`/conversation-profile/${profile.id}`} className="table-link">
+                    {profile.name}
                   </Link>
                 </td>
-                <td>{flow.description}</td>
+                <td>{profile.description}</td>
                 <td>
-                  <span className="status-badge status-active">{flow.status}</span>
+                  <span className="status-badge status-active">{profile.status}</span>
                 </td>
-                <td>{flow.owner}</td>
-                <td>{flow.createdOn}</td>
+                <td>{profile.owner}</td>
+                <td>{profile.createdOn}</td>
               </tr>
             ))}
           </tbody>
@@ -152,4 +152,4 @@ const ConversationFlows: React.FC = () => {
   );
 };
 
-export default ConversationFlows;
+export default ConversationProfiles;

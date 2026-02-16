@@ -8,8 +8,8 @@ import VoiceChannels from './components/VoiceChannels';
 import ChannelEdit from './components/ChannelEdit';
 import VoiceChannelEdit from './components/VoiceChannelEdit';
 import ChannelExperiences from './components/ChannelExperiences';
-import ConversationFlows from './components/ConversationFlows';
-import ConversationFlowEdit from './components/ConversationFlowEdit';
+import ConversationProfiles from './components/ConversationProfiles';
+import ConversationProfileEdit from './components/ConversationProfileEdit';
 import EngagementProfiles from './components/EngagementProfiles';
 import EngagementProfileEdit from './components/EngagementProfileEdit';
 import Queues from './components/Queues';
@@ -20,7 +20,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const isEditPage = location.pathname.startsWith('/channel/') ||
                      location.pathname.startsWith('/voice-channel/') ||
-                     location.pathname.startsWith('/conversation-flow/') ||
+                     location.pathname.startsWith('/conversation-profile/') ||
                      location.pathname.startsWith('/engagement-profile/');
 
   if (isEditPage) {
@@ -50,13 +50,13 @@ const App: React.FC = () => {
           <Route path="/chat-channels" element={<ChatChannels />} />
           <Route path="/voice-channels" element={<VoiceChannels />} />
           <Route path="/channel-experiences" element={<ChannelExperiences />} />
-          <Route path="/conversation-flows" element={<ConversationFlows />} />
+          <Route path="/conversation-profiles" element={<ConversationProfiles />} />
           <Route path="/engagement-profiles" element={<EngagementProfiles />} />
           <Route path="/queues" element={<Queues />} />
           <Route path="/queue/:id" element={<QueueEdit />} />
           <Route path="/channel/:id" element={<ChannelEdit />} />
           <Route path="/voice-channel/:id" element={<VoiceChannelEdit />} />
-          <Route path="/conversation-flow/:id" element={<ConversationFlowEdit />} />
+          <Route path="/conversation-profile/:id" element={<ConversationProfileEdit />} />
           <Route path="/engagement-profile/:id" element={<EngagementProfileEdit />} />
         </Routes>
       </Layout>
